@@ -1,0 +1,25 @@
+{
+    "name": "Generando Importador de Productos",
+    "summary": "Importador de Productos",
+    "category": "crm",
+    "images": [],
+    "version": "1.0.2",
+    "application": True,
+    "author": "Ahorasoft",
+    "support": "soporte@ahorasoft.com",
+    "website": "http://www.ahorasoft.com",
+    "depends": [
+        "crm",
+        "sale",
+        'base',
+        'sale_management',
+    ],
+    'data': [
+        'views/as_importar_productos.xml',
+        'views/as_product_template.xml',
+        'security/ir.model.access.csv',
+        'data/data.xml',
+    ],
+    "auto_install": False,
+    "installable": True,
+}

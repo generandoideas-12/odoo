@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="as_product_template_form_view" model="ir.ui.view">
+           <field name="name">as.product.template.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="priority">18</field>
+            <field name="inherit_id" ref="product.product_template_form_view" />
+            <field name="arch" type="xml">
+                <field name="uom_po_id" position="before">
+                    <field name="as_codigo_proveedor" />
+                    <field name="as_costo_proveedor" />
+                    <field name="as_existencias" />
+                    <field name="as_factor"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>

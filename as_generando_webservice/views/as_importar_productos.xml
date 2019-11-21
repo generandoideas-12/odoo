@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Formulario de Importacion -->
+        <record model="ir.ui.view" id="as_importar_productos_view_form">
+            <field name="name">as.importar.productos.view.form</field>
+            <field name="model">as.importar.productos</field>
+            <field name="arch" type="xml">
+                <form string="Importador de Productos">
+                    <header>
+                        <button name="importar_productos" string="Importar" class="oe_highlight" type="object" confirm="El proceso de importacion puede tardar algunos minutos, procedemos?"/>
+                        <button name="activar" string="Activar" class="oe_highlight" type="object" confirm="Esta tarea de importacion sera planificada para ejecutarse, procedemos?"/>
+                    </header>
+                    <sheet string="Importador de Productos">
+                        <group>
+                            <field name="name"/>
+                            <field name="as_url"/>
+                            <field name="as_login"/>
+                            <field name="as_password"/>
+                            <field name="as_iteracion"/>
+                            <field name="as_limit"/>
+                            <field name="as_resultado"/>
+                            <field name="as_factor"/>
+                            <field name="as_activo"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- tree ventas, campos adicionales -->
+        <record id="as_importar_productos_view_tree" model="ir.ui.view">
+            <field name="name">as.importar.productos_view_tree</field>
+            <field name="model">as.importar.productos</field>
+            <field name="arch" type="xml">
+                <tree string="Importaciones">
+                    <!-- <field name="name"/> -->
+                    <field name="write_date"/>
+                    <field name="as_resultado"/>
+                    <field name="as_activo"/>
+
+                </tree>
+            </field>
+        </record>  
+
+        <!-- Accion de Importacion -->
+        <record id="as_importar_productos_action" model="ir.actions.act_window">
+            <field name="name">Importador de Productos</field>
+            <field name="res_model">as.importar.productos</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" eval="as_importar_productos_view_tree"/>
+            <field name="target">current</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Crear una nueva importacion
+              </p><p>
+                Crear una registro y presionar IMPORTAR
+              </p>
+            </field>
+        </record>
+
+        <menuitem id="as_importar_productos_menu" name="Importar Productos"
+            parent="sale.sale_menu_root" sequence="5" action="as_importar_productos_action"/>
+    </data>
+</odoo>
