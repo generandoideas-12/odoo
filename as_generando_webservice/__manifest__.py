@@ -3,7 +3,7 @@
     "summary": "Importador de Productos",
     "category": "crm",
     "images": [],
-    "version": "1.0.3",
+    "version": "1.0.4",
     "application": True,
     "author": "Ahorasoft",
     "support": "soporte@ahorasoft.com",
@@ -14,6 +14,7 @@
         'base',
         'sale_management',
         'purchase',
+        'report_xlsx',
     ],
     'data': [
         'views/as_importar_productos.xml',
