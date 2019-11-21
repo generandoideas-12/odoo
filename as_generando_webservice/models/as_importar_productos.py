@@ -46,6 +46,13 @@ class as_importar_productos(models.Model):
         self.env.cr.execute(query)
         self.as_activo = True
 
+    def descontinuar(self):
+        query = """
+            UPDATE product_template
+                SET as_descontinuado = True
+        """
+        self.env.cr.execute(query)
+
     def validacion_numero(self,valor, tipo):
         try:
             resultado = tipo(valor)
@@ -60,15 +67,19 @@ class as_importar_productos(models.Model):
 
     @api.multi
     def update_product(self, ids, values):
-        # product_obj = self.env['product.product']
-        
+        product_obj = self.env['product.product'].search([('id','=',ids.id)])
+        ids.update({
+            'as_costo_anterior':product_obj.as_costo_proveedor
+        })
         vals = {
             'name':values.get('NOMPROD'),
             'as_codigo_proveedor':values.get('CODPROD'),
             'as_costo_proveedor':float(values.get('COSUNIT')),
+            'as_name_proveedor':values.get('PROVEEDOR'),
             'as_existencias':values.get('EXISTENCIAS'),
             'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
             'as_factor':float(self.as_factor),
+            'as_descontinuado':False,
             # 'default_code':values.get('PROVEEDOR'),
         }
         # _logger.debug("\n\nValores update_product: %s \n\nIDs: %s", str(vals), ids)
@@ -79,14 +90,16 @@ class as_importar_productos(models.Model):
     @api.multi
     def create_product(self, values):
         product_obj = self.env['product.product']
-        
         vals = {
             'name':values.get('NOMPROD'),
             'as_codigo_proveedor':values.get('CODPROD'),
             'as_costo_proveedor':float(values.get('COSUNIT')),
             'as_existencias':values.get('EXISTENCIAS'),
+            'as_name_proveedor':values.get('PROVEEDOR'),
             'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
             'as_factor':float(self.as_factor),
+            'as_descontinuado':False,
+            'as_costo_anterior':float(0.00),
             
             # 'default_code':values.get('PROVEEDOR'),
         }
@@ -101,7 +114,7 @@ class as_importar_productos(models.Model):
         return False
 
     def importar_productos(self):
-
+        self.descontinuar()
         importar = self.env['as.importar.productos'].search([('as_activo','=', True)])
         for operacion in importar:
             response = requests.get(operacion.as_url,auth=requests.auth.HTTPBasicAuth(operacion.as_login,operacion.as_password))

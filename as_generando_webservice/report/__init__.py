@@ -1,0 +1,1 @@
+from . import as_product_descontinuados
