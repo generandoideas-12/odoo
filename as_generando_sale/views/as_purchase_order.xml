@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="as_purchase_order_form_inherit">
+            <field name="name">as_purchase.order.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="priority" eval="17"/>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='taxes_id']" position="after">
+                    <field name="price_subtotal_integer" />
+                </xpath>
+                <xpath expr="//tree/field[@name='price_subtotal']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath> 
+
+                <xpath expr="//group[@class='oe_subtotal_footer oe_right']" position="replace">
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="amount_untaxed_integer" options="{'currency_field': 'currency_id'}"/>
+                        <field name="amount_tax_integer" options="{'currency_field': 'currency_id'}"/>
+                        <div class="oe_subtotal_footer_separator oe_inline">
+                            <label for="amount_total_integer"/>
+                        </div>
+                        <field name="amount_total_integer" nolabel="1" class="oe_subtotal_footer_separator" options="{'currency_field': 'currency_id'}"/>
+                    </group>
+                </xpath>
+
+            </field>
+        </record>
+
+       <!-- tree ventas, campos adicionales -->
+        <record id="as_purchase_order_tree" model="ir.ui.view">
+            <field name="name">as.purchase_order_tree</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount_untaxed']" position="replace">
+                    <field name="amount_untaxed_integer" sum="Sin Impuestos"/>
+                </xpath>            
+                <xpath expr="//field[@name='amount_total']" position="replace">
+                    <field name="amount_total_integer" sum="Total con Impuestos"/>
+                </xpath>
+            </field>
+        </record>  
+
+        <!-- kanban ventas, campos adicionales -->
+        <record id="as_sale_view_purchase_order_kanban" model="ir.ui.view">
+            <field name="name">as.sale.view_purchase_order_kanban</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.view_purchase_order_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//strong/field[@name='amount_total']" position="replace">
+                    <field name="amount_total_integer" sum="Total con Impuestos"/>
+                </xpath>
+            </field>
+        </record>  
+
+    </data>
+</odoo>
+
+
+    
