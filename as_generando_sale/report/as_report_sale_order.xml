@@ -15,9 +15,9 @@
                         <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line['display_type'] == 'line_section' else 'font-italic o_line_note' if line['display_type'] == 'line_note' else ''">
                             <t t-if="not line['display_type']">
                                 <td style='width:40%'>
-                                <span t-esc="line['name']"/>
-                                Material: <span t-esc="line['material']"/>
-                                Medidas: <span t-esc="line['medidas']"/>
+                                <span t-esc="line['name']"/><br/>
+                                Material: <span t-esc="line['material']"/><br/>
+                                Medidas: <span t-esc="line['medidas']"/><br/>
                                  <t t-if="line['aplicacion'] != ''">
                                 Aplicacion: <span t-esc="line['aplicacion']"/>                                 
                                  </t>
@@ -43,9 +43,9 @@
                             </t>
                             <t t-if="line['display_type'] == 'line_section'">
                                 <td colspan="99">
-                                <span t-esc="line['name']"/>
-                                Material: <span t-esc="line['material']"/>
-                                Medidas: <span t-esc="line['medidas']"/>
+                                <span t-esc="line['name']"/><br/>
+                                Material: <span t-esc="line['material']"/><br/>
+                                Medidas: <span t-esc="line['medidas']"/><br/>
                                  <t t-if="line['aplicacion']!=''">
                                 Aplicacion: <span t-esc="line['aplicacion']"/>                                 
                                  </t>
@@ -56,9 +56,9 @@
                             </t>
                             <t t-if="line['display_type'] == 'line_note'">
                                  <td>
-                                <span t-esc="line['name']"/>
-                                Material: <span t-esc="line['material']"/>
-                                Medidas: <span t-esc="line['medidas']"/>
+                                <span t-esc="line['name']"/><br/>
+                                Material: <span t-esc="line['material']"/><br/>
+                                Medidas: <span t-esc="line['medidas']"/><br/>
                                  <t t-if="line['aplicacion']!=''">
                                 Aplicacion: <span t-esc="line['aplicacion']"/>                                 
                                  </t>
