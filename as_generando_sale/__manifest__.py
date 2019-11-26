@@ -3,7 +3,7 @@
     "summary": "Nucleo para Ventas",
     "category": "crm",
     "images": [],
-    "version": "1.0.1",
+    "version": "1.0.2",
     "application": True,
     "author": "Ahorasoft",
     "support": "soporte@ahorasoft.com",
@@ -18,6 +18,7 @@
     'data': [
         'report/as_report_sale_order.xml',
         'report/as_report_invoice.xml',
+        'views/as_sale_order.xml',
     ],
     "auto_install": False,
     "installable": True,

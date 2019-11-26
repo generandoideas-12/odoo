@@ -18,6 +18,16 @@ logger = logging.getLogger(__name__)
 class as_SaleOrder(models.Model):
     _inherit = "sale.order"
 
+
+    print_image = fields.Boolean(
+        'Print Image', help="""If ticked, you can see the product image in
+        report of sale order/quotation""")
+    image_sizes = fields.Selection(
+        [('image', 'Big sized Image'), ('image_medium', 'Medium Sized Image'),
+         ('image_small', 'Small Sized Image')],
+        'Image Sizes', default="image_small",
+        help="Image size to be displayed in report")
+
     @api.multi
     def line_product_edit(self):
         posiciones_insigneas = []
@@ -32,6 +42,7 @@ class as_SaleOrder(models.Model):
                 elif bandera==True:
                     insignea+=1
                 line_venta= {
+                        'image': line.product_id.image,
                         'price_total': line.price_total,
                         'display_type': line.display_type,
                         'display_type': line.display_type,
@@ -64,6 +75,10 @@ class as_SaleOrder(models.Model):
                     posiciones_insigneas[insignea]['aplicacion']= line.name
                     posiciones_insigneas[insignea]['price_subtotal']+=line.price_subtotal
                 
-        return posiciones_insigneas
-                    
-        
+        return posiciones_insigneas           
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    image_small = fields.Binary(
+        'Product Image', related='product_id.image_small')
