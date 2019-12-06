@@ -13,7 +13,7 @@ class SaleOrderAttachments(http.Controller):
 
     @http.route(
         ['/purchase/order_attachments/<int:order_id>'],
-        type='http', auth="user", methods=['POST'], website=True, csrf=False)
+        type='http', auth="user", methods=['POST'], website=True)
     def attach_files(self, order_id, access_token=None, **post):
         
         if 'purchase_order' in request.params:
