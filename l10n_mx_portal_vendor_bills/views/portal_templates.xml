@@ -7,7 +7,6 @@
             <div class="panel-body">
                 <form t-attf-action="/purchase/order_attachments/{{order.id}}"
                     class="s_upload_attachments container-fluid mt32"
-                    data-success_page="/purchase/order-attachment-thank-you"
                     enctype="multipart/form-data"
                     method="post"
                     t-att-data-form_field_order_id="order.id"
@@ -25,14 +24,18 @@
                         <input class="form-control o_website_form_input"
                             name="purchase_order"
                             t-att-required="'' if partner_id.l10n_mx_edi_is_indirect else False"
-                            type="file"/>
+                            type="file"
+                            multiple="True"
+                            />
                     </div>
                     <div t-att-class="'form-group form-field o_website_form_custom o_website_form_required_custom col-md-3' if partner_id.l10n_mx_edi_is_indirect else 'form-group form-field o_website_form_custom col-md-3'">
                         <label class="control-label" for="ack_receipt">Acknowledgment of receipt</label>
                         <input class="form-control o_website_form_input"
                             name="receipt"
                             t-att-required="'' if partner_id.l10n_mx_edi_is_indirect else False"
-                            type="file"/>
+                            type="file"
+                            multiple="True"
+                            />
                     </div>
                     <div class="form-group">
                         <div class="col-sm-12 text-left nopadding">
@@ -62,6 +65,11 @@
                                 </t>
                             </p>
                             <p class="mt64">If you have a problem, do not hesitate to contact us by phone:</p>
+                            <h2 class="mt64">El Pedido <b><span t-esc="order.name"/></b> tiene un Total de: <span t-esc="order.amount_total"/></h2>
+                            <h2 class="mt64">El archivo XML enviado tiene un Total de: <span t-esc="total_xml"/></h2>
+                            
+                            <p>Gracias</p>
+
                             <ul class="list-unstyled">
                                 <li>
                                     <i class="fa fa-phone"/>:
