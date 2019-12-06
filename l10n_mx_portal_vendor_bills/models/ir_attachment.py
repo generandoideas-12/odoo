@@ -13,7 +13,7 @@ class IrAttachment(models.Model):
     _inherit = 'ir.attachment'
 
     @api.model
-    def parse_xml(self, xml_file):
+    def parse_xml(self, xml_file,key):
         """Simple wrapper to the wizard that runs the whole process of the
         importation of documents on the backend, some extra steps are done
         here:
@@ -34,10 +34,10 @@ class IrAttachment(models.Model):
         """
 
         # Instancing the wizard that will import the xml file
-        wiz = self.env['attach.xmls.wizard'].sudo()
+        wiz = self.env['l10n_mx_base.attachment.wizard'].sudo()
         xml_string = xml_file.read()
         data = base64.b64encode(xml_string)
-        res = wiz.check_xml({xml_file.filename: data})
+        res = wiz.check_xml({xml_file.filename: data},key)
         xml = objectify.fromstring(xml_string)
 
         # early return if errors found
