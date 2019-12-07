@@ -11,7 +11,6 @@
                     <field name="as_codigo_proveedor" />
                     <field name="as_costo_proveedor" />
                     <field name="as_costo_anterior" />
-                    <field name="as_costo_anterior" />
                     <field name="as_name_proveedor"/>
                     <field name="as_existencias" />
                     <field name="as_factor"/>
