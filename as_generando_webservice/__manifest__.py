@@ -3,7 +3,7 @@
     "summary": "Importador de Productos",
     "category": "crm",
     "images": [],
-    "version": "1.0.4",
+    "version": "1.0.5",
     "application": True,
     "author": "Ahorasoft",
     "support": "soporte@ahorasoft.com",
@@ -19,6 +19,7 @@
     'data': [
         'views/as_importar_productos.xml',
         'views/as_product_template.xml',
+        'views/as_product_descontinuados.xml',
         'wizard/as_product_report.xml',
         'security/ir.model.access.csv',
         'data/data.xml',
