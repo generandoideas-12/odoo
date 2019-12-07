@@ -71,7 +71,7 @@ class as_importar_productos(models.Model):
 
     @api.multi
     def update_product(self, ids, values):
-        product_obj = self.env['product.product'].search([('id','=',ids.id)])
+        product_obj = self.env['product.product'].search([('id','=',ids.id)],limit=1)
         ids.update({
             'as_costo_anterior':product_obj.as_costo_proveedor
         })
@@ -149,7 +149,7 @@ class as_importar_productos(models.Model):
                     time.clock() 
                     
                     if value:
-                        product_ids = self.env['product.product'].search([('as_codigo_proveedor','=', value.get('CODPROD'))])
+                        product_ids = self.env['product.product'].search([('as_codigo_proveedor','=', value.get('CODPROD'))],limit=1)
                         # product_ids = self.obtener_producto(productos,value.get('CODPROD'))
                         if product_ids:
                             res = self.update_product(product_ids,value)
