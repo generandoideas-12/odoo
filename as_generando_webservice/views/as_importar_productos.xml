@@ -22,6 +22,7 @@
                             <field name="as_resultado"/>
                             <field name="as_factor"/>
                             <field name="as_activo"/>
+                            <field name="as_catalogo"/>
                         </group>
                     </sheet>
                     <div class="oe_chatter">

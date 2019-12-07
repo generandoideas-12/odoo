@@ -37,14 +37,18 @@ class as_importar_productos(models.Model):
     as_resultado = fields.Boolean('Resultado', default=False, readonly=True)
     as_activo = fields.Boolean('Activado', default=False, readonly=True)
     as_factor = fields.Float('Factor Precio', default=1)
+    as_catalogo = fields.Char('Catalogo JSON', default='response')
 
     def activar(self):
-        query = """
-            UPDATE as_importar_productos
-                SET as_activo = False
-        """
-        self.env.cr.execute(query)
-        self.as_activo = True
+        # query = """
+        #     UPDATE as_importar_productos
+        #         SET as_activo = False
+        # """
+        # self.env.cr.execute(query)
+        if self.as_activo:
+            self.as_activo = False
+        else:
+            self.as_activo = True
 
     def descontinuar(self):
         query = """
@@ -119,54 +123,58 @@ class as_importar_productos(models.Model):
         for operacion in importar:
             response = requests.get(operacion.as_url,auth=requests.auth.HTTPBasicAuth(operacion.as_login,operacion.as_password))
             jsondata = json.loads(response.text)
-            jsondata = jsondata['response']
             
-            jsondata = self.take(operacion.as_limit, jsondata)
-            
-            print(jsondata)
-            operacion.message_post(body=len(jsondata))
-
-            keys = ['CODPROD','NOMPROD','COSUNIT','EXISTENCIAS','PROVEEDOR']
-
-            count = 0
-            counter = 0
-            total_elapsed = 0
-            nro_orders = len(jsondata)
-
-            productos = self.env['product.product'].search([])
-            
-            for value in jsondata:
-                # Inicializar tiempo
-                count += 1
-                elapsed = 0
-                start = time.time()
-                time.clock() 
-
-                # field = map(str, jsondata[i])
-                # values = dict(zip(keys, field))
-                # _logger.debug("Valores update_product: %s", str(values))
+            if operacion.as_catalogo in jsondata:
                 
-                if value:
-                    product_ids = self.env['product.product'].search([('as_codigo_proveedor','=', value.get('CODPROD'))])
-                    # product_ids = self.obtener_producto(productos,value.get('CODPROD'))
-                    if product_ids:
-                        res = self.update_product(product_ids,value)
-                        tipo_operacion = 'UPDATE'
-                    else:
-                        res = self.create_product(value)
-                        tipo_operacion = 'CREATE'                    
-                        # raise Warning(_('"%s" Product not found.') % values.get('default_code'))
+                jsondata = jsondata[operacion.as_catalogo]
                 
-                # Escribir cada cierta iteracion
-                if count == operacion.as_iteracion:
-                    self.env.cr.commit()
-                    count = 0
+                jsondata = self.take(operacion.as_limit, jsondata)
+                
+                print(jsondata)
+
+                keys = ['CODPROD','NOMPROD','COSUNIT','EXISTENCIAS','PROVEEDOR']
+
+                count = 0
+                counter = 0
+                total_elapsed = 0
+                nro_orders = len(jsondata)
+
+                productos = self.env['product.product'].search([])
+                
+                for value in jsondata:
+                    # Inicializar tiempo
+                    count += 1
+                    elapsed = 0
+                    start = time.time()
+                    time.clock() 
                     
-                # Tiempo transcurrido
-                elapsed = round((time.time() - start),2)
-                total_elapsed = elapsed + total_elapsed
-                counter = counter + 1
-                percentage = round(float(counter) / nro_orders * 100,2)
-                _logger.info("\n\nNro: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s", counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed, round((total_elapsed/60),2))
+                    if value:
+                        product_ids = self.env['product.product'].search([('as_codigo_proveedor','=', value.get('CODPROD'))])
+                        # product_ids = self.obtener_producto(productos,value.get('CODPROD'))
+                        if product_ids:
+                            res = self.update_product(product_ids,value)
+                            tipo_operacion = 'UPDATE'
+                        else:
+                            res = self.create_product(value)
+                            tipo_operacion = 'CREATE'                    
+                            # raise Warning(_('"%s" Product not found.') % values.get('default_code'))
+                    
+                    # Escribir cada cierta iteracion
+                    if count == operacion.as_iteracion:
+                        self.env.cr.commit()
+                        count = 0
+                        
+                    # Tiempo transcurrido
+                    elapsed = round((time.time() - start),2)
+                    total_elapsed = elapsed + total_elapsed
+                    counter = counter + 1
+                    percentage = round(float(counter) / nro_orders * 100,2)
+                    _logger.info("\n\nNro: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s", counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed, round((total_elapsed/60),2))
 
-            operacion.as_resultado = True
+                operacion.as_resultado = True
+                body="<b>Nro registros: </b>%s <b>Tiempo: </b>%s<br>" %(len(jsondata),total_elapsed)
+                operacion.message_post(body = body, content_subtype='html')
+
+            else:
+                raise ValidationError(
+                    _("Valor en 'Catalogo JSON' Incorrecto: " + operacion.as_catalogo))
