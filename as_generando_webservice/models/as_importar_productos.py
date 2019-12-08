@@ -69,6 +69,14 @@ class as_importar_productos(models.Model):
         "Return first n items of the iterable as a list"
         return list(islice(iterable, n))
 
+    def repetidos(self):
+        query = """
+        select a.producto,a.repetidos from (select as_codigo_proveedor as producto, count(id) as repetidos from product_template group by 1 order by 2 desc) as a where a.repetidos > 1 and producto is not null;
+        """
+        self.env.cr.execute(query)
+        repetidos = self.env.cr.fetchall()
+        return repetidos
+
     @api.multi
     def update_product(self, ids, values):
         product_obj = self.env['product.product'].search([('id','=',ids.id)],limit=1)

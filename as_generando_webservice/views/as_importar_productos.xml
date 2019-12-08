@@ -39,7 +39,7 @@
             <field name="model">as.importar.productos</field>
             <field name="arch" type="xml">
                 <tree string="Importaciones">
-                    <!-- <field name="name"/> -->
+                    <field name="name"/>
                     <field name="write_date"/>
                     <field name="as_resultado"/>
                     <field name="as_activo"/>
