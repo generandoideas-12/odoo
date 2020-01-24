@@ -9,6 +9,8 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tools.misc import formatLang
 from odoo.osv import expression
 from odoo.tools import float_is_zero, float_compare
+from tabulate import tabulate
+import pandas as pd
 
 from werkzeug.urls import url_encode
 
@@ -17,7 +19,7 @@ import requests, json
 from itertools import islice
 import time
 
-
+headers="keys"
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -69,14 +71,6 @@ class as_importar_productos(models.Model):
         "Return first n items of the iterable as a list"
         return list(islice(iterable, n))
 
-    def repetidos(self):
-        query = """
-        select a.producto,a.repetidos from (select as_codigo_proveedor as producto, count(id) as repetidos from product_template group by 1 order by 2 desc) as a where a.repetidos > 1 and producto is not null;
-        """
-        self.env.cr.execute(query)
-        repetidos = self.env.cr.fetchall()
-        return repetidos
-
     @api.multi
     def update_product(self, ids, values):
         product_obj = self.env['product.product'].search([('id','=',ids.id)],limit=1)
@@ -111,6 +105,8 @@ class as_importar_productos(models.Model):
             'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
             'as_factor':float(self.as_factor),
             'as_descontinuado':False,
+            'sale_ok':True,
+            'purchase_ok':True,
             'as_costo_anterior':float(0.00),
             
             # 'default_code':values.get('PROVEEDOR'),
@@ -180,9 +176,83 @@ class as_importar_productos(models.Model):
                     _logger.info("\n\nNro: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s", counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed, round((total_elapsed/60),2))
 
                 operacion.as_resultado = True
-                body="<b>Nro registros: </b>%s <b>Tiempo: </b>%s<br>" %(len(jsondata),total_elapsed)
+                
+                
+                
+                body =  "<b>Total Productos Remotos: </b>%s <br>" %(len(jsondata))
+                body += "<b>Total Productos Locales: </b>%s <br>" %(str(self.as_total_productos_actuales()))
+                body += "<b>Tiempo (Segundos): </b>%s <br>" %(round(total_elapsed,2))
+                
+                table = tabulate(jsondata,headers,tablefmt='html')
+                table = table.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                body += "<b>REST Importados: </b></br>%s <br>" %(table)
+                
+                table_diferencias = tabulate(self.as_diferencias(jsondata),headers,tablefmt='html')
+                table_diferencias = table_diferencias.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                body += "<b>DIFERENCIA entre DB LOCAL y Remoto: </b></br>%s <br>" %(table_diferencias)
+                
+                table_unicos = tabulate(self.as_remover_duplicados(jsondata),headers,tablefmt='html')
+                table_unicos = table_unicos.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                body += "<b>REST Importados Unicos: </b></br>%s <br>" %(table_unicos)
+                
+                table_duplicados = tabulate(self.as_duplicados(jsondata),headers,tablefmt='html')
+                table_duplicados = table_duplicados.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                body += "<b>REST Importados Duplicados: </b></br>%s <br>" %(table_duplicados)
+                                
+                table_duplicados_local = tabulate(self.as_repetidos(),headers,tablefmt='html')
+                table_duplicados_local = table_duplicados_local.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                body += "<b>DB Duplicados: </b></br>%s <br>" %(table_duplicados_local)
+
+
+                # body += 
                 operacion.message_post(body = body, content_subtype='html')
 
             else:
                 raise ValidationError(
                     _("Valor en 'Catalogo JSON' Incorrecto: " + operacion.as_catalogo))
+                
+    # LOCAL Repetidos 
+    def as_repetidos(self):
+        query = """
+        select a.producto as "CODPROD",a.nombre as "NOMPROD", a.repetidos from (select as_codigo_proveedor as producto, name as nombre, count(id) as repetidos from product_template group by 1,2 order by 3 desc) as a where a.repetidos > 1 and producto is not null;
+        """
+        self.env.cr.execute(query)
+        repetidos = self.env.cr.dictfetchall()
+        return repetidos
+    
+    # LOCAL Total Productos 
+    def as_total_productos_actuales(self):
+        query = """
+        select count(id) as cuenta from product_template;
+        """
+        self.env.cr.execute(query)
+        repetidos = self.env.cr.fetchall()
+        return repetidos[0][0]
+    
+    def as_productos_actuales(self):
+        query = """
+        select a.as_codigo_proveedor as "CODPROD",a.name as "NOMPROD" from product_template as a where a.as_codigo_proveedor is not null;
+        """
+        self.env.cr.execute(query)
+        productos = self.env.cr.dictfetchall()
+        return productos    
+    
+    def as_remover_duplicados(self,data):
+        df = pd.DataFrame(data,columns=['CODPROD', 'NOMPROD'])
+        df.sort_values("CODPROD", inplace = True)
+        df.drop_duplicates(subset ="CODPROD", keep = False, inplace = True) 
+        return df
+    
+    def as_duplicados(self,data):
+        df = pd.DataFrame(data,columns=['CODPROD', 'NOMPROD'])
+        duplicated_df=df[df.CODPROD.duplicated(keep=False)]
+        return duplicated_df
+    
+    def as_diferencias(self,json):
+        df2=pd.DataFrame(json)
+        df1=pd.DataFrame(self.as_productos_actuales())
+        df1.sort_values("CODPROD", inplace = True)
+        df2.sort_values("CODPROD", inplace = True)
+        
+        df_1notin2 = df1[~(df1['CODPROD'].isin(df2['CODPROD']) & df1['NOMPROD'].isin(df2['NOMPROD']))].reset_index(drop=True)
+        return df_1notin2
