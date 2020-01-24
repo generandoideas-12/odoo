@@ -1,0 +1,425 @@
+<openerp>
+    <data>
+
+
+
+	<record id="transport_sale_order_extended_view" model="ir.ui.view">
+        <field name="name">sale.order.extended.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_term_id" position="after">
+                <field name="transport_id"/>
+            </field>
+        </field>
+    </record>
+
+
+        <record id="view_transport_details_form" model="ir.ui.view">
+            <field name="name">transport.form.view</field>
+            <field name="model">transport</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Transport Details">
+                    <group col="4">
+                        <field name="imgsm" widget="image" />
+                        <field name="name"/>
+                        <field name="contact_name"/>
+ 						
+                    </group>
+                    <label for="street" string="Address" class="oe_edit_only" />
+                    <div>
+                        <field name="street" />
+                        <field name="street2" />
+
+                    </div>
+                    <div>
+						<group>
+                        <field name="vehicle_id" />
+						</group>
+                    </div>
+                    <group col="2">
+                        <field name="comment" />
+                        <field name="phone" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+
+
+
+
+
+        <record id="view_transport_routes_details_form" model="ir.ui.view">
+            <field name="name">transport.route.form.view</field>
+            <field name="model">transport.route</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Transport Routes Details">
+                    <group col="2">
+                        <field name="name"/>
+                        <field name="transporter_id"/>
+ 						
+                    </group>
+                              <notebook>
+                                    <page string ="Location Details">
+                                         <field name="rote_locations_ids">
+                                         <tree editable="top">
+                                          <field name="source_loc"/>
+                                          <field name="dest_loc"/>
+                                          <field name="distance"/>
+                                           <field name="time" widget="float_time"/>
+                                           </tree> 
+                                         </field>
+
+                                    </page>
+                              </notebook>    
+
+
+                </form>
+            </field>
+        </record>
+
+
+
+
+
+
+
+
+
+
+
+        <record id="view_transport_routes_location_details_form" model="ir.ui.view">
+            <field name="name">transport.route.form.location.view</field>
+            <field name="model">route.locations</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Transport Routes Location Details">
+
+
+                    <group col="2">
+
+   <field name="name"/>
+                    
+                     			
+                    </group>
+                     
+
+                </form>
+            
+
+            </field>
+        </record>
+
+
+        <record id='transport_view_kanban1' model='ir.ui.view'>
+            <field name="name">transport.kanban</field>
+            <field name="model">transport</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="name" />
+                    <field name="id"/>
+                    <field name="contact_name" />
+                    <field name="vehicle_id" />
+                    <field name="phone" />
+                    <field name="image" />
+                    <field name="imgsm"/>
+
+                    <templates>
+
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('transport', 'imgsm', record.id.raw_value)" alt="Product"/>
+                            </div>
+                            
+                            <div class="oe_kanban_details">
+                                    <strong>
+                                        <field name="name"/> : <field name="contact_name"/><br/>
+                                        <field name="vehicle_id"/><br/>
+                                        <field name="phone"/>
+                                    </strong>
+                                    
+                               </div>
+                        </div>
+                    </t>
+                </templates>
+                </kanban>
+            </field>
+        </record>
+
+         <record id="view_transport_details_tree" model="ir.ui.view">
+            <field name="name">Transport Details</field>
+            <field name="model">transport</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Transport Details">
+                    <field name="name"/>
+                    <field name="contact_name"/>
+                    <field name="phone"/>
+
+                </tree>
+            </field>
+        </record>
+
+
+
+
+
+
+         <record id="view_transport_rote_tree" model="ir.ui.view">
+            <field name="name">Transport Routes Details</field>
+            <field name="model">transport.route</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Transport Routes Details">
+                    <field name="name"/>
+                    <field name="transporter_id"/>
+
+                </tree>
+            </field>
+        </record>
+
+
+
+
+     <record id="view_transport_location_rote_tree" model="ir.ui.view">
+            <field name="name">Transport Location Details</field>
+            <field name="model">route.locations</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Transport Routes Location Details">
+                       <field name="name"/>
+                                        
+                </tree>
+            </field>
+        </record>
+
+
+
+
+	<record id="main_transport_action" model="ir.actions.act_window">
+        <field name="name">Transporters Details</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">transport</field>
+        <field name="view_type">form</field>
+		<field name="view_mode">tree,kanban,form</field>
+        </record>
+
+
+
+
+
+
+
+	<record id="action_trsport_route" model="ir.actions.act_window">
+        <field name="name">Transporters Routes Details</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">transport.route</field>
+        <field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+    </record>
+
+
+
+	<record id="action_trsport_route_location" model="ir.actions.act_window">
+        <field name="name">Transporters Routes Location Details</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">route.locations</field>
+        <field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+        </record>
+
+
+
+
+
+
+		<!--Menu for main transport details configuration menu-->
+
+		<menuitem id="menu_transport_details_config"   parent="sale.menu_sale_config" action="main_transport_action" 
+       />
+    
+	<menuitem id="Transporter Routes Configuration" string="Transporter Routes Configuration"   parent="sale.menu_sale_config"  
+       />
+    
+
+	<menuitem id="Transporter Routes Configuration Details"  string="Transporter Routes Configuration"  parent="Transporter Routes Configuration" action="action_trsport_route"  
+       />
+
+
+
+
+	<menuitem id="Transporter Routes Locations Configuration"  string="Transporter Routes Locations Configuration"  parent="sale.menu_sale_config" 
+       />
+    
+
+	<menuitem id="Transporter Routes Locations Configuration Details"   string="Transporter Routes Locations Configuration"  parent="Transporter Routes Locations Configuration" action="action_trsport_route_location"  
+       />
+
+<!--Tree view and form view for the transport entry-->
+
+
+        <record id="view_transport_entry_details_form" model="ir.ui.view">
+            <field name="name">transport.entry.form.view</field>
+            <field name="model">transport.entry</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Transport Entry Details">
+
+        			<header>
+                        <button name="move_to_halt" class="oe_highlight" states="draft" string="Halt" type="object"/>
+						<button name="move_to_done" class="oe_highlight" states="draft,waiting" string="Done" type="object"/>
+						<button name="move_to_cancel" class="oe_highlight" states="draft,waiting" string="Cancel" type="object"/>
+						<button name="copy_transport_entry" class="oe_highlight" states="cancel" string="Reschedule" type="object"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,waiting,done,cancel"/>
+                    </header>
+
+                        <group col="4">
+                            <field name="date" />
+                            <field name="note" />
+                            <field name="picking_id" />
+                            <field name="contact_person"/>
+							<field name="lr_number" readonly="1"/>
+						    <field name="no_of_parcels" readonly="1"/>
+                            <field name="customer_id"/>
+                              <field name="vehicle_id" />
+
+                        </group>
+
+                          <notebook>
+                           <page string ="Location Details">
+                                         <field name="transport_rote_ids">
+                                         <tree editable="top">
+                                          <field name="source_loc"/>
+                                          <field name="dest_loc"/>
+                                          <field name="distance"/>
+                                           <field name="time" widget="float_time"/>
+                                           <field name="start_time"/>
+                                           <field name="end_time"/>
+                                           <field name="tracking_number"/>
+                                           <field name="state"/>
+                                           </tree> 
+                                         </field>
+                              </page>
+                          </notebook>
+                </form>
+            </field>
+        </record>
+
+
+
+
+  	<record id="view_transport_entry_tree" model="ir.ui.view">
+            <field name="name">transport.entry.tree.view</field>
+            <field name="model">transport.entry</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Transport Entry Details">
+                    <field name="date" />
+                    <field name="note" />
+                    <field name="picking_id" />
+                    <field name= "active"/>
+					<field name= "transport_id"/>
+                </tree>
+            </field>
+        </record>
+
+
+
+   <record id="action_view_transport_entry" model="ir.actions.act_window">
+            <field name="name">Transport Entry</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">transport.entry</field>
+            <field name="view_type">form</field>
+            <field name="domain">[('picking_id', '=', active_id)]</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+<record id="action_view_all_transport_entry" model="ir.actions.act_window">
+            <field name="name">Transport Details</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">transport</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+
+
+     <record id="action_view_transport_entry2" model="ir.actions.act_window">
+            <field name="name">Transport Entry</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">transport.entry</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <record id="action_view_transport_report" model="ir.actions.act_window">
+            <field name="name">Daily Transport Wizard</field>
+            <field name="res_model">transport.entry.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_transport_wizard" model="ir.ui.view">
+            <field name="name">transport.entry.wizard</field>
+            <field name="model">transport.entry.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Transport Entry Details">
+                    <group >
+                        <field name="start_date" />
+                        <field name="trasporter_id"/>
+                    </group>
+                    <footer>
+                        <button name="print_excel_report" string="Print" type='object' class="oe_highlight"/>
+                        <button string="Cancel" special="cancel" class="oe_link"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <menuitem id="Daily Transport Report" name=" Daily Transport Entry Report" parent="sale.sale_order_menu"  
+                action="action_view_transport_report"  />
+                
+         <menuitem name="Transport Entry"  id="transport_view" parent="sale.sale_order_menu" 
+        sequence="16" action="action_view_transport_entry2"  />
+
+
+	<record id="view_transport_excel" model="ir.ui.view">
+            <field name="name">Daily Transport Report</field>
+            <field name="model">daily.taransport.report.excel</field>
+            <field name="arch" type="xml">
+                <form string="Genrated xls File" version="10.0">
+                    <group>
+                        <field name="file_name" invisible="1"/>
+                        <field name="excel_file" readonly="1" filename="file_name"/>
+                    </group>
+                </form>
+            </field>
+     </record>
+
+        <record id="action_account_invoice_excel" model="ir.actions.act_window">
+            <field name="name">Daily Transport Report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="res_model">daily.taransport.report.excel</field>
+            <field name="target">new</field>
+        </record>
+
+
+
+
+
+
+
+
+    </data>
+</openerp>
+

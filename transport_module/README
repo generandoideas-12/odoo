@@ -1,0 +1,5 @@
+12.0.0.3 - 25/11/2019
+
+-> Remove extra code, and add location details only on on-change.
+
+12.0.0.4 -> Fixed error for internal picking
