@@ -183,9 +183,9 @@ class as_importar_productos(models.Model):
                 body += "<b>Total Productos Locales: </b>%s <br>" %(str(self.as_total_productos_actuales()))
                 body += "<b>Tiempo (Segundos): </b>%s <br>" %(round(total_elapsed,2))
                 
-                table = tabulate(jsondata,headers,tablefmt='html')
-                table = table.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
-                body += "<b>REST Importados: </b></br>%s <br>" %(table)
+                # table = tabulate(jsondata,headers,tablefmt='html')
+                # table = table.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                # body += "<b>REST Importados: </b></br>%s <br>" %(table)
                 
                 table_diferencias = tabulate(self.as_diferencias(jsondata),headers,tablefmt='html')
                 table_diferencias = table_diferencias.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
