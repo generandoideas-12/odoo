@@ -8,9 +8,12 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="before">
                 <field name="image_small" widget="image"/>
+                <field name="as_customer_name" />
+
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="before">
                 <field name="image_small" widget="image"/>
+                <field name="as_customer_name" />
             </xpath>
             <field name="client_order_ref" position="after">
                 <field name="print_image"/>

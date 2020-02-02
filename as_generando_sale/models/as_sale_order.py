@@ -77,8 +77,19 @@ class as_SaleOrder(models.Model):
                 
         return posiciones_insigneas           
 
-class SaleOrderLine(models.Model):
+class as_SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    image_small = fields.Binary(
-        'Product Image', related='product_id.image_small')
+    # @api.model
+    def compute_get_default_partner(self):
+        
+        ctx = self._context
+        cliente = self.env['res.partner'].search([('id','=',ctx.get('partner_id'))],limit=1)
+            
+        return cliente.name or "Guarde la Venta Primero"
+        #     return self.env['sale.order'].browse(ctx.get('active_ids')[0]).partner_id.id
+
+    image_small = fields.Binary('Product Image',related='product_id.image_small')
+    
+    as_customer_name = fields.Char('as_customer_name',default=compute_get_default_partner)
+    
