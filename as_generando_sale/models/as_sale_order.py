@@ -80,7 +80,7 @@ class as_SaleOrder(models.Model):
 class as_SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    # @api.model
+    # para enviar el nombre del cliente poner como contexto en el campo que llama a otro objeto: "{'default_partner_name':as_customer_name}"
     def compute_get_default_partner(self):
         
         ctx = self._context
