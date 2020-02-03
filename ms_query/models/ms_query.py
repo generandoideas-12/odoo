@@ -42,4 +42,4 @@ class MsQuery(models.Model):
         else :
             self.result = 'Successful'
         #self.message_post('%s<br><br>Executed on %s'%(self.name,str(self.get_real_datetime())[:19]))
-        self.message_post('Executed on %s'%(self.name))
+        self.message_post('Executed')
