@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<templates id="template" xml:space="preserve">
+
+    <t t-name="CustomInfoPopup">
+        <div class="modal-dialog">
+            <div class="popup popup-textinput" style="height:260px !important">
+                <p class="title" id="message_title" style="width:92%">
+                    <t t-esc=" widget.options.title || 'Message' " />
+                </p>
+                <p class="body" id="message_body">
+                    <t t-esc="  widget.options.body || '' " />
+                </p>
+                <div class="footer">
+                    <div class="button cancel">
+                        OK
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="CreateSalesOrderWidget">
+        <div class='control-button'>
+            <i class='fa fa-star' />Create Sales Order
+        </div>
+    </t>
+
+    <t t-name="CreateSalesOrderPopupWidget">
+        <div class="modal-dialog">
+            <div class="popup wk_popup">
+                <p class="title">Create Sales Order <span style="font-size:12px;margin-left:30%;">Delivery Date: <input type="text" class="input_date" id="datepicker" placeholder="MM/DD/YYYY"/></span>
+                </p>
+                <script>
+                $(function() {
+                    $("#tabs").tabs();
+                    $("#datepicker").datepicker();
+                });
+                </script>
+                <div id="tabs" style="font-size:12px">
+                    <ul>
+                        <li><a href="#tabs-2" style=" font-size: 15px !important;">Shipping Address</a></li>
+                        <li><a href="#tabs-1" style=" font-size: 15px !important;">Extra Fees</a></li>
+                        <li><a href="#tabs-3" style=" font-size: 15px !important;">Note</a></li>
+                    </ul>
+                    <div id="tabs-1" style="height:250px">
+                        <table>
+                            <tr>
+                                <td>Use Extra Fee</td>
+                                <td>
+                                    <input type="checkbox" class="extra_fee" style="width: 13px; min-height:0px;" />
+                                </td>
+                            </tr>
+                        </table>
+                        <table>
+                            <tr>
+                                <td>
+                                    <input type="number" class="extra_fee_value" />
+                                </td>
+                            </tr>
+                        </table>
+                        <div id="no_extra_product">
+                            <span> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  Extra price product is not selected in backend configuration</span>
+                        </div>
+                    </div>
+                    <div id="tabs-2" style="height:250px">
+                        <table>
+                            <tr>
+                                <td>Ship to Diffrent Address</td>
+                                <td>
+                                    <input type="checkbox" class="diffrent_address" style="width: 13px; min-height:0px;" />
+                                </td>
+                            </tr>
+                        </table>
+                        <form name="address_form">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <input class="wk_address" type="text" placeholder="Name" name="name" />
+                                    </td>
+                                    <td>
+                                        <input class="wk_address" type="text" placeholder="Email" name="email" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input class="wk_address" type="text" placeholder="Street" name="street" />
+                                    </td>
+                                    <td>
+                                        <input class="wk_address" type="text" placeholder="City" name="city" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input class="wk_address" type="text" placeholder="Zip" name="zip" />
+                                    </td>
+                                    <td>
+                                        <select class='wk_address' name='country_id' style="font-size: 15px !important;width: 229px;float: left;margin-left: 29px;">
+                                            <option value=''>Country:None</option>
+                                            <t t-foreach='widget.pos.countries' t-as='country'>
+                                                <option t-att-value='country.id'>
+                                                    <t t-esc='country.name' />
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input class="wk_address" type="text" placeholder="Mobile" name="mobile" />
+                                    </td>
+                                    <td>
+                                        <input class="wk_address" type="text" placeholder="Phone" name="phone" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                    <div id="tabs-3" style="height:250px">
+                        <textarea class="wk_note" rows="7" cols="35" placeholder="Add a Note..........." />
+                    </div>
+                </div>
+                <div class="footer">
+                    <div class="button wk_create_order">
+                        Create
+                    </div>
+                    <div class="button  cancel">
+                        Cancel
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="OrderPrintPopupWidget">
+        <div class="modal-dialog">
+            <div class="popup wk_print_quot">
+                <p class="title"> Confirmation</p>
+                <div class='wk_order_data'>
+                    Sale order Ref -
+                    <t t-esc=" widget.options.title || 'Error' " />
+                </div>
+                <div class="footer">
+                    <div class="button cancel">
+                        Cancel
+                    </div>
+                    <div class="button wk_email">
+                        Send by Email
+                    </div>
+                    <div class="button wk_print_quotation" t-att-id='widget.options.order_id'>
+                        Print
+                        <i class="fa fa-print" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>
