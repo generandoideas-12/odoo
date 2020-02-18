@@ -1,2 +1,2 @@
 # odoo
-Colaborativo V1
+Colaborativo V1.1
