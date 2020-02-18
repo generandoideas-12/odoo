@@ -77,19 +77,8 @@ class as_SaleOrder(models.Model):
                 
         return posiciones_insigneas           
 
-class as_SaleOrderLine(models.Model):
+class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    # para enviar el nombre del cliente poner como contexto en el campo que llama a otro objeto: "{'default_partner_name':as_customer_name}"
-    def compute_get_default_partner(self):
-        
-        ctx = self._context
-        cliente = self.env['res.partner'].search([('id','=',ctx.get('partner_id'))],limit=1)
-            
-        return cliente.name or "Guarde la Venta Primero"
-        #     return self.env['sale.order'].browse(ctx.get('active_ids')[0]).partner_id.id
-
-    image_small = fields.Binary('Product Image',related='product_id.image_small')
-    
-    as_customer_name = fields.Char('as_customer_name',default=compute_get_default_partner)
-    
+    image_small = fields.Binary(
+        'Product Image', related='product_id.image_small')
