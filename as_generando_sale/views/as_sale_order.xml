@@ -60,6 +60,7 @@
                 <field name="purchase_id" readonly="True" />
                 <field name="partner_id" readonly="True" />
                 <field name="partner_app_id" />
+                <field name="location_app_dest_id" />
                 <field name="location_app_id" />
                 <field name="state" />
                 <button name="action_create_picking" string="Transferir a Logistica" icon="fa-sign-out" type="object"

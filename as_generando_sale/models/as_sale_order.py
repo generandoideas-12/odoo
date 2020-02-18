@@ -116,6 +116,7 @@ class as_SaleOrder(models.Model):
                     'sale_id':self.id,
                     'purchase_id': purchase.id,
                     'partner_id': purchase.partner_id.id,
+                    'location_app_dest_id': purchase.picking_type_id.default_location_dest_id.id,
                 }
                 purchase_adeudadas.append(vals)
         return purchase_adeudadas
@@ -141,8 +142,9 @@ class AsSalesPurchase(models.Model):
     purchase_id = fields.Many2one('purchase.order', string="Purchase Order")
     partner_id = fields.Many2one('res.partner',string="Proveedor de Producto", store=True)
     partner_app_id = fields.Many2one('res.partner',string="Proveedor de Aplicacion", store=True)
-    location_app_id = fields.Many2one('stock.location',string="Ubicacion Producto", store=True)
-    state = fields.Selection([('draft', 'Confirmado'),('transfer', 'Transferido'),('cancel', 'Cancelado')],string='Status', readonly=True,default='draft')
+    location_app_id = fields.Many2one('stock.location',string="Ubicacion Producto", store=True, domain=[('usage','=','internal')])
+    location_app_dest_id = fields.Many2one('stock.location',string="Ubicacion Origen Producto", store=True)
+    state = fields.Selection([('draft', 'Borrador'),('transfer', 'Transferido'),('cancel', 'Cancelado')],string='Estado de Linea a Transferir', readonly=True,default='draft')
     picking_id = fields.Many2one('stock.picking',  string="Movimiento Logistica")
     as_invoice_id = fields.Many2one('account.invoice', string="Factura", copy=False)
     as_invoice_id_done = fields.Boolean( string="Facturado", defaul=False)
@@ -150,7 +152,7 @@ class AsSalesPurchase(models.Model):
     @api.multi
     def action_create_picking(self):
         picking_type = self.env['stock.picking.type'].sudo().search([('default_location_dest_id', '=', self.location_app_id.id)], limit=1)
-        location_src_id = self.purchase_id.picking_type_id.default_location_dest_id
+        location_src_id = self.location_app_dest_id
         vals = {
             'name' : picking_type.sequence_id.next_by_id() if picking_type else '/',
             'state' : 'draft',
