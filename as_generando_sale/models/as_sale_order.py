@@ -112,11 +112,16 @@ class as_SaleOrder(models.Model):
                 resultado_consulta.append(i[0])
             purchases = self.env['purchase.order'].sudo().search([('id', 'in', resultado_consulta)])
             for purchase in purchases:
+                if len(purchase.picking_ids.ids) > 0:
+                    insignea = True
+                else:
+                    insignea = False
                 vals = {
                     'sale_id':self.id,
                     'purchase_id': purchase.id,
                     'partner_id': purchase.partner_id.id,
                     'location_app_dest_id': purchase.picking_type_id.default_location_dest_id.id,
+                    'as_product_insig': insignea,
                 }
                 purchase_adeudadas.append(vals)
         return purchase_adeudadas
@@ -138,16 +143,25 @@ class SaleOrderLine(models.Model):
 class AsSalesPurchase(models.Model):
     _name = 'as.sale.purchase'
 
+
+    @api.multi
+    def _get_status_compra(self):
+        self.ensure_one()
+        self.state_purchase = self.purchase_id.status
+
+
     sale_id = fields.Many2one('sale.order', string="Sale Order")
     purchase_id = fields.Many2one('purchase.order', string="Purchase Order")
     partner_id = fields.Many2one('res.partner',string="Proveedor de Producto", store=True)
     partner_app_id = fields.Many2one('res.partner',string="Proveedor de Aplicacion", store=True)
-    location_app_id = fields.Many2one('stock.location',string="Ubicacion Producto", store=True, domain=[('usage','=','internal')])
+    location_app_id = fields.Many2one('stock.location',string="Ubicacion Destino Producto", store=True, domain=[('usage','=','internal')])
     location_app_dest_id = fields.Many2one('stock.location',string="Ubicacion Origen Producto", store=True)
     state = fields.Selection([('draft', 'Borrador'),('transfer', 'Transferido'),('cancel', 'Cancelado')],string='Estado de Linea a Transferir', readonly=True,default='draft')
     picking_id = fields.Many2one('stock.picking',  string="Movimiento Logistica")
     as_invoice_id = fields.Many2one('account.invoice', string="Factura", copy=False)
-    as_invoice_id_done = fields.Boolean( string="Facturado", defaul=False)
+    as_invoice_id_done = fields.Boolean( string="producto Insignea", defaul=False)
+    as_product_insig = fields.Boolean( string="producto Insignea", defaul=False)
+    state_purchase = fields.Selection([('draft', 'RFQ'),('sent', 'RFQ Sent'),('to approve', 'To Approve'),('purchase', 'Purchase Order'),('done', 'Locked'),('cancel', 'Cancelled')], string='Status Compra', readonly=True, default='draft',compute="_get_status_compra",store=True)
 
     @api.multi
     def action_create_picking(self):
@@ -178,7 +192,7 @@ class AsSalesPurchase(models.Model):
                     'sale_line_id' : line.id,
                 }
                 line_id = self.env['stock.move'].create(vals)
-        # sp2.action_confirm()
+        # sp2.action_confirm()as_product_insig
         # wiz_id = self.env['stock.immediate.transfer'].with_context(active_ids=sp2.ids, active_id=sp2.id, default_pick_id=sp2.id).create({'pick_id': sp2.id})
         # wiz_id.process()
         # sp2.button_validate()
@@ -232,27 +246,6 @@ class AsSalesPurchase(models.Model):
                     'price_unit' : line.price_unit,
                 })
         invoice.action_invoice_open()
-        # for line in self.sale_id.order_line:
-        #     if line.product_id.type == 'product':
-        #         lines_invoice.append({
-        #             'name' : line.name,
-        #             'product_id' : line.product_id.id,
-        #             'quantity' : line.product_uom_qty,
-        #             'price_unit' : line.price_unit,
-        #             })      
-        # # values = {
-        #     'partner_id': self.partner_app_id.id,
-        #     'account_id' : self.partner_app_id.property_account_payable_id.id,
-        #     'date_invoice' : str(self.sale_id.date_order),
-        #     'reference' : str(self.sale_id.name)+', '+str(self.purchase_id.name),
-        #     'state' : 'draft',
-        #     'invoice_line_ids': lines_invoice,
-        #     'type': 'in_invoice',
-        #     'company_id': self.sale_id.company_id.id,
-        # }
-        # factura_obj = self.env['account.invoice'].with_context(
-        #     type='in_invoice',state='draft').create(values)
-        # factura_obj.action_invoice_open()
         self.as_invoice_id = invoice.id
         self.as_invoice_id_done = True
         return True
