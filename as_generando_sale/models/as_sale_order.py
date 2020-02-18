@@ -21,7 +21,7 @@ class as_SaleOrder(models.Model):
 
     line_purchases = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True)
     line_purchases_picking = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True,domain=[('state','=','transfer')])
-    line_purchases_finanzas = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True,domain=[('as_invoice_id','!=','')])
+    line_purchases_finanzas = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True,domain=[('as_invoice_id_done','=',True)])
     print_image = fields.Boolean(
         'Print Image', help="""If ticked, you can see the product image in
         report of sale order/quotation""")
@@ -85,14 +85,6 @@ class as_SaleOrder(models.Model):
         return posiciones_insigneas
 
     @api.multi
-    def _action_confirm(self):
-        res = super(as_SaleOrder, self)._action_confirm()
-        for so in self:
-            purchases = so._get_sale_purchase()
-            so.line_purchases.create(purchases)
-        return res
-
-    @api.multi
     def _get_sale_purchase(self):
         purchase_adeudadas = []
         if self.name:
@@ -116,6 +108,14 @@ class as_SaleOrder(models.Model):
                 }
                 purchase_adeudadas.append(vals)
         return purchase_adeudadas
+
+    @api.multi
+    def _action_confirm(self):
+        res = super(as_SaleOrder, self)._action_confirm()
+        for so in self:
+            purchases = so._get_sale_purchase()
+            so.line_purchases.create(purchases)
+        return res
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -182,11 +182,12 @@ class AsSalesPurchase(models.Model):
     sale_id = fields.Many2one('sale.order', string="Sale Order")
     purchase_id = fields.Many2one('purchase.order', string="Purchase Order")
     partner_id = fields.Many2one('res.partner',string="Proveedor de Producto", store=True)
-    partner_app_id = fields.Many2one('res.partner',string="Proveedor de Aplicacion", store=True,required=True)
-    location_app_id = fields.Many2one('stock.location',string="Ubicacion Producto", store=True,required=True)
+    partner_app_id = fields.Many2one('res.partner',string="Proveedor de Aplicacion", store=True)
+    location_app_id = fields.Many2one('stock.location',string="Ubicacion Producto", store=True)
     state = fields.Selection([('draft', 'Confirmado'),('transfer', 'Transferido'),('cancel', 'Cancelado')],string='Status', readonly=True,default='draft')
     picking_id = fields.Many2one('stock.picking',  string="Movimiento Logistica")
     as_invoice_id = fields.Many2one('account.invoice', string="Factura", copy=False)
+    as_invoice_id_done = fields.Boolean( string="Facturado", defaul=False)
 
     @api.multi
     def action_create_picking(self):
@@ -257,25 +258,41 @@ class AsSalesPurchase(models.Model):
     def action_create_invoice(self):  
         #lineas de la factura
         lines_invoice = []
+        invoice = self.env['account.invoice'].create({
+            'partner_id': self.partner_app_id.id,
+            'account_id': self.partner_app_id.property_account_payable_id.id,
+        })
         for line in self.sale_id.order_line:
             if line.product_id.type == 'product':
-                lines_invoice.append({
-                    'name' : line.name,
-                    'product_id' : line.product_id.id,
+                self.env['account.invoice.line'].create({
+                    'invoice_id': invoice.id,
+                    'account_id': line.product_id.property_account_income_id.id,
+                    'name': line.product_id.product_tmpl_id.name,
                     'quantity' : line.product_uom_qty,
                     'price_unit' : line.price_unit,
-                    })      
-        values = {
-            'partner_id': self.partner_app_id.id,
-            'account_id' : self.partner_app_id.property_account_payable_id.id,
-            'date_invoice' : str(self.sale_id.date_order),
-            'reference' : str(self.sale_id.name)+', '+str(self.purchase_id.name),
-            'state' : 'draft',
-            'origin' : str(self.sale_id.name)+', '+str(self.purchase_id.name),
-            'invoice_line_ids': lines_invoice,
-        }
-        factura_obj = self.env['account.invoice'].with_context(
-            type='in_invoice',state='draft').create(values)
-        factura_obj.action_invoice_open()
-        self.as_invoice_id = factura_obj.id
+                })
+        invoice.action_invoice_open()
+        # for line in self.sale_id.order_line:
+        #     if line.product_id.type == 'product':
+        #         lines_invoice.append({
+        #             'name' : line.name,
+        #             'product_id' : line.product_id.id,
+        #             'quantity' : line.product_uom_qty,
+        #             'price_unit' : line.price_unit,
+        #             })      
+        # # values = {
+        #     'partner_id': self.partner_app_id.id,
+        #     'account_id' : self.partner_app_id.property_account_payable_id.id,
+        #     'date_invoice' : str(self.sale_id.date_order),
+        #     'reference' : str(self.sale_id.name)+', '+str(self.purchase_id.name),
+        #     'state' : 'draft',
+        #     'invoice_line_ids': lines_invoice,
+        #     'type': 'in_invoice',
+        #     'company_id': self.sale_id.company_id.id,
+        # }
+        # factura_obj = self.env['account.invoice'].with_context(
+        #     type='in_invoice',state='draft').create(values)
+        # factura_obj.action_invoice_open()
+        self.as_invoice_id = invoice.id
+        self.as_invoice_id_done = True
         return True
