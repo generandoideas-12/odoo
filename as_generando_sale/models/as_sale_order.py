@@ -19,8 +19,8 @@ class as_SaleOrder(models.Model):
     _inherit = "sale.order"
 
 
-    line_purchases = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True)
-    line_purchases_picking = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True,domain=[('state','=','transfer')])
+    line_purchases = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True,domain=[('as_product_insig','=',True)])
+    line_purchases_picking = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True)
     line_purchases_finanzas = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True,domain=[('as_invoice_id_done','=',True)])
     print_image = fields.Boolean(
         'Print Image', help="""If ticked, you can see the product image in
@@ -30,6 +30,8 @@ class as_SaleOrder(models.Model):
          ('image_small', 'Small Sized Image')],
         'Image Sizes', default="image_small",
         help="Image size to be displayed in report")
+    line_propuesta = fields.One2many('as.propuesta', 'sale_id', string="Lineas de Propueta",store=True)
+
     
     @api.multi
     def update_create_picking(self):
@@ -112,14 +114,15 @@ class as_SaleOrder(models.Model):
                 resultado_consulta.append(i[0])
             purchases = self.env['purchase.order'].sudo().search([('id', 'in', resultado_consulta)])
             for purchase in purchases:
-                if len(purchase.picking_ids.ids) > 0:
-                    insignea = True
-                else:
-                    insignea = False
+                # if len(purchase.picking_ids.ids) > 0:
+                insignea = True
+                # else:
+                #     insignea = False
                 vals = {
                     'sale_id':self.id,
                     'purchase_id': purchase.id,
                     'partner_id': purchase.partner_id.id,
+                    'state_purchase': purchase.state,
                     'location_app_dest_id': purchase.picking_type_id.default_location_dest_id.id,
                     'as_product_insig': insignea,
                 }
@@ -144,12 +147,6 @@ class AsSalesPurchase(models.Model):
     _name = 'as.sale.purchase'
 
 
-    @api.multi
-    def _get_status_compra(self):
-        self.ensure_one()
-        self.state_purchase = self.purchase_id.status
-
-
     sale_id = fields.Many2one('sale.order', string="Sale Order")
     purchase_id = fields.Many2one('purchase.order', string="Purchase Order")
     partner_id = fields.Many2one('res.partner',string="Proveedor de Producto", store=True)
@@ -161,8 +158,33 @@ class AsSalesPurchase(models.Model):
     as_invoice_id = fields.Many2one('account.invoice', string="Factura", copy=False)
     as_invoice_id_done = fields.Boolean( string="producto Insignea", defaul=False)
     as_product_insig = fields.Boolean( string="producto Insignea", defaul=False)
-    state_purchase = fields.Selection([('draft', 'RFQ'),('sent', 'RFQ Sent'),('to approve', 'To Approve'),('purchase', 'Purchase Order'),('done', 'Locked'),('cancel', 'Cancelled')], string='Status Compra', readonly=True, default='draft',compute="_get_status_compra",store=True)
+    state_purchase = fields.Selection([('draft', 'RFQ'),('sent', 'RFQ Sent'),('to approve', 'To Approve'),('purchase', 'Purchase Order'),('done', 'Locked'),('cancel', 'Cancelled')], string='Status Compra', readonly=True, default='draft',store=True, related='purchase_id.state')
+    #datos de compra
+    date_purchase = fields.Datetime(string='Purchase Date',related='purchase_id.date_order')
+    total_compra = fields.Monetary(string='Total Compra',related='purchase_id.amount_total')
+    picking_ids = fields.Many2many('stock.picking', compute='_compute_picking', string='Orden de Entrega',related='purchase_id.picking_ids')
+    #campos d efactura
+    date_invoice = fields.Date(string='Invoice Date',related='as_invoice_id.date_invoice')
+    number = fields.Char(string='Numero',related='as_invoice_id.name')
+    currency_id = fields.Many2one('res.currency', string='Currency',related='as_invoice_id.currency_id')
+    ref = fields.Char(string='Ref. de pago',related='as_invoice_id.reference')
+    date_vence = fields.Date(string='Fecha de Vencimiento',related='as_invoice_id.date_due')
+    impuesto = fields.Monetary(string='Impuesto de Incluido',related='as_invoice_id.amount_tax')
+    impuesto_no = fields.Monetary(string='Impuesto no Incluido',related='as_invoice_id.amount_untaxed')
+    amount_total = fields.Monetary(string='Impuesto no Incluido',related='as_invoice_id.amount_total')
+    residual = fields.Monetary(string='A pagar',related='as_invoice_id.residual')
+    state_invoice = fields.Selection([('draft', 'Draft'),('open', 'Open'),('paid', 'Paid'),('cancel', 'Cancelled')], string='Invoice Status',related='as_invoice_id.state')
 
+    def _compute_picking(self):
+        for lines in self:
+            for order in lines.purchase_id:
+                pickings = self.env['stock.picking']
+                for line in order.order_line:
+                    moves = line.move_ids | line.move_ids.mapped('returned_move_ids')
+                    pickings |= moves.mapped('picking_id')
+                order.picking_ids = pickings
+                order.picking_count = len(pickings)
+        
     @api.multi
     def action_create_picking(self):
         picking_type = self.env['stock.picking.type'].sudo().search([('default_location_dest_id', '=', self.location_app_id.id)], limit=1)
@@ -200,6 +222,16 @@ class AsSalesPurchase(models.Model):
             'state': 'transfer',
             'picking_id': sp2.id,
         })
+        #crear movimiento 
+        vals = {
+                'sale_id':self.sale_id.id,
+                'purchase_id': self.purchase_id.id,
+                'partner_id': self.partner_app_id.id,
+                'state_purchase': self.purchase_id.state,
+                'location_app_dest_id': sp2.location_dest_id.id,
+                'as_product_insig': True,
+            }
+        line  = self.create(vals)
         return True
 
     @api.multi
@@ -249,3 +281,11 @@ class AsSalesPurchase(models.Model):
         self.as_invoice_id = invoice.id
         self.as_invoice_id_done = True
         return True
+
+class AsSalesPurchase(models.Model):
+    _name = 'as.propuesta'
+
+    sale_id = fields.Many2one('sale.order', string="Sale Order")
+    propuesta = fields.Binary(string ='Propuesta')
+    state = fields.Selection([('aprobado', 'Aprobado'),('re-trabajar', 'Re-Trabajar'),('no-aplica', 'No Aplica')], string='Status')
+    observaciones = fields.Char(string ='Observaciones')

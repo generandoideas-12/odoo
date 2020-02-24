@@ -3,7 +3,7 @@
     "summary": "Nucleo para Ventas",
     "category": "crm",
     "images": [],
-    "version": "1.0.7",
+    "version": "1.0.8",
     "application": True,
     "author": "Ahorasoft",
     "support": "soporte@ahorasoft.com",
@@ -14,6 +14,8 @@
         'base',
         'sale_management',
         'account',
+        'helpdesk',
+        'purchase',
     ],
     'data': [
         'report/as_report_sale_order.xml',

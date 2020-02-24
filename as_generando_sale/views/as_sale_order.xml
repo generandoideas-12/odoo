@@ -28,11 +28,17 @@
                         <tree create="false" editable="bottom" decoration-success="state == 'transfer'"
                             decoration-danger="state == 'cancel'" delete="0" domain="[('state','=','transfer')]">
                             <field name="purchase_id" readonly="True" />
-                            <field name="partner_app_id" readonly="True" />
-                            <field name="location_app_id" readonly="True" />
+                            <field name="partner_app_id" />
+                            <field name="location_app_dest_id" />
+                            <field name="location_app_id" />
                             <field name="picking_id" readonly="True" />
                             <field name="state" readonly="True" />
+                              <field name="as_product_insig" invisible="1" />
                             <button name="action_invoice_supplier" string="Generar Factura" icon="fa-file-text"
+                                type="object" states='draft,transfer' />
+                            <button name="action_create_picking" string="Transferir a Logistica" icon="fa-sign-out"
+                                type="object" attrs="{'invisible': [('as_product_insig','=',False)]}" />
+                            <button name="action_anular_picking" string="Anular movimiento" icon="fa-window-close"
                                 type="object" states='draft,transfer' />
 
                         </tree>
@@ -45,6 +51,23 @@
                             <field name="partner_app_id" readonly="True" />
                             <field name="location_app_id" readonly="True" />
                             <field name="as_invoice_id" readonly="True" />
+                            <field name="number" readonly="True" />
+                            <field name="ref" readonly="True" />
+                            <field name="date_vence" readonly="True" />
+                            <field name="impuesto" readonly="True" />
+                            <field name="impuesto_no" readonly="True" />
+                            <field name="amount_total" readonly="True" />
+                            <field name="residual" readonly="True" />
+                            <field name="state_invoice" readonly="True" />
+                        </tree>
+                    </field>
+                </page>
+                  <page string="Diseño" name="diseno">
+                    <field name="line_propuesta">
+                        <tree create="1" editable="bottom">
+                            <field name="propuesta" widget="image" width="150px" height="150px"/>
+                            <field name="observaciones"/>
+                            <field name="state"/>
                         </tree>
                     </field>
                 </page>
@@ -57,18 +80,19 @@
         <field name="arch" type="xml">
             <tree create="false" editable="bottom" decoration-success="state == 'transfer'"
                 decoration-danger="state == 'cancel'" delete="0">
+                <field name="as_product_insig" invisible="1" />
                 <field name="purchase_id" readonly="True" />
                 <field name="partner_id" readonly="True" />
                 <field name="partner_app_id" />
                 <field name="location_app_dest_id" />
                 <field name="location_app_id" />
                 <field name="state_purchase" />
+                <field name="picking_ids" widget="many2many_tags"/>
+                <field name="date_purchase" />
+                <field name="total_compra" />
                 <field name="state" />
-                <field name="as_product_insig" invisible="1"/>
-                <button name="action_create_picking" string="Transferir a Logistica" icon="fa-sign-out" type="object"
-                    attrs="{'invisible': [('as_product_insig','=',False)]}" />
-                <button name="action_anular_picking" string="Anular movimiento" icon="fa-window-close" type="object"
-                    states='draft,transfer' />
+              
+
             </tree>
         </field>
     </record>
