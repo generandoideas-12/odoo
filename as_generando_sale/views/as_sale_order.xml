@@ -32,12 +32,11 @@
                             <field name="location_app_dest_id" />
                             <field name="location_app_id" />
                             <field name="picking_id" readonly="True" />
+                            <field name="state_picking" readonly="True" />
                             <field name="state" readonly="True" />
                             <field name="as_product_insig" invisible="1" />
-                            <button name="action_invoice_supplier" string="Generar Factura" icon="fa-file-text"
-                                type="object" states='draft,transfer' />
-                            <button name="action_create_picking" string="Transferir a Logistica" icon="fa-sign-out"
-                                type="object" attrs="{'invisible': [('as_product_insig','=',False)]}" />
+                            <button name="action_create_picking" string="Transferir a Logistica" icon="fa-sign-out" states='draft'
+                                type="object" />
                             <button name="action_anular_picking" string="Anular movimiento" icon="fa-window-close"
                                 type="object" states='draft,transfer' />
 
@@ -96,6 +95,8 @@
                 <field name="date_purchase" />
                 <field name="total_compra" />
                 <field name="state" invisible="1" />
+                <button name="action_invoice_supplier" string="Generar Factura" icon="fa-file-text"
+                                type="object" states='draft,transfer' />
 
 
             </tree>

@@ -28,11 +28,13 @@ class PurchaseOrder(models.Model):
                     'sale_id':as_sales_purchase.sale_id.id,
                     'purchase_id': self.id,
                     'partner_id': self.partner_id.id,
+                    'partner_app_id': self.partner_id.id,
                     'state_purchase': self.state,
                     'location_app_dest_id': pick.location_id.id, #origen
                     'location_app_id':  pick.location_dest_id.id, #destino
                     'state':  'transfer', #destino
                     'picking_id':  pick.id, #picking
+                    'as_product_almacenable':  True, #picking
             }
             line  = as_sales_create.create(vals)
         return res

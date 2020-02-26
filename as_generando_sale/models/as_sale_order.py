@@ -20,7 +20,7 @@ class as_SaleOrder(models.Model):
 
 
     line_purchases = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True,domain=[('as_product_insig','=',True)])
-    line_purchases_picking = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True)
+    line_purchases_picking = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True,domain=[('as_product_almacenable','=',True)])
     line_purchases_finanzas = fields.One2many('as.sale.purchase', 'sale_id', string="Lineas de compras en la Venta",store=True,domain=[('as_invoice_id_done','=',True)])
     print_image = fields.Boolean(
         'Print Image', help="""If ticked, you can see the product image in
@@ -128,6 +128,10 @@ class as_SaleOrder(models.Model):
                 resultado_consulta.append(i[0])
             purchases = self.env['purchase.order'].sudo().search([('id', 'in', resultado_consulta)])
             for purchase in purchases:
+                almacena= False
+                for line in purchase.order_line[0]:
+                    if line.product_id.type == 'product':
+                        almacena =True
                 # if len(purchase.picking_ids.ids) > 0:
                 insignea = True
                 # else:
@@ -139,6 +143,7 @@ class as_SaleOrder(models.Model):
                     'state_purchase': purchase.state,
                     'location_app_dest_id': purchase.picking_type_id.default_location_dest_id.id,
                     'as_product_insig': insignea,
+                    'as_product_almacenable': almacena,
                 }
                 purchase_adeudadas.append(vals)
         return purchase_adeudadas
@@ -172,6 +177,7 @@ class AsSalesPurchase(models.Model):
     as_invoice_id = fields.Many2one('account.invoice', string="Factura", copy=False)
     as_invoice_id_done = fields.Boolean( string="producto Insignea", defaul=False)
     as_product_insig = fields.Boolean( string="producto Insignea", defaul=False)
+    as_product_almacenable = fields.Boolean( string="producto Almacenable", defaul=False)
     state_purchase = fields.Selection([('draft', 'RFQ'),('sent', 'RFQ Sent'),('to approve', 'To Approve'),('purchase', 'Purchase Order'),('done', 'Locked'),('cancel', 'Cancelled')], string='Estado Compra', readonly=True, default='draft',store=True, related='purchase_id.state')
     #datos de compra
     date_purchase = fields.Datetime(string='Fecha Compra',related='purchase_id.date_order')
@@ -188,6 +194,7 @@ class AsSalesPurchase(models.Model):
     amount_total = fields.Monetary(string='Impuesto no Incluido',related='as_invoice_id.amount_total')
     residual = fields.Monetary(string='A pagar',related='as_invoice_id.residual')
     state_invoice = fields.Selection([('draft', 'Draft'),('open', 'Open'),('paid', 'Paid'),('cancel', 'Cancelled')], string='Invoice Status',related='as_invoice_id.state')
+    state_picking = fields.Selection(string='Estado Movimiento', selection=[('draft', 'Draft'),('cancel', 'Cancelled'), ('confirm', 'In Progress'),('done', 'Validated')], readonly=True,default='draft',related='picking_id.state')
 
 
     def _compute_picking(self):
@@ -240,6 +247,7 @@ class AsSalesPurchase(models.Model):
                 'partner_id': self.partner_app_id.id,
                 'state_purchase': self.purchase_id.state,
                 'location_app_dest_id': sp2.location_dest_id.id,
+                'as_product_almacenable': True,
             }
         line  = self.create(vals)
         return True
