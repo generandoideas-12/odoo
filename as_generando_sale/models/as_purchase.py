@@ -21,14 +21,18 @@ class PurchaseOrder(models.Model):
 
     def button_confirm(self):
         res = super(PurchaseOrder, self).button_confirm()
-        as_sales_purchase = self.env['as.sale.purchase'].sudo().search([('purchase_id', '=', self.id)])
-        for purchase_sale in as_sales_purchase:
-            if len(self.picking_ids.ids) > 0:
-                insignea = True
-            else:
-                insignea = False
-            as_sales_purchase.write({
-                'location_app_dest_id': self.picking_type_id.default_location_dest_id.id,
-                'as_product_insig': insignea,
-            })
+        as_sales_create = self.env['as.sale.purchase']
+        as_sales_purchase = self.env['as.sale.purchase'].sudo().search([('purchase_id', '=', self.id)],limit=1)
+        for pick in self.picking_ids:
+            vals = {
+                    'sale_id':as_sales_purchase.sale_id.id,
+                    'purchase_id': self.id,
+                    'partner_id': self.partner_id.id,
+                    'state_purchase': self.state,
+                    'location_app_dest_id': pick.location_id.id, #origen
+                    'location_app_id':  pick.location_dest_id.id, #destino
+                    'state':  'transfer', #destino
+                    'picking_id':  pick.id, #picking
+            }
+            line  = as_sales_create.create(vals)
         return res

@@ -33,7 +33,7 @@
                             <field name="location_app_id" />
                             <field name="picking_id" readonly="True" />
                             <field name="state" readonly="True" />
-                              <field name="as_product_insig" invisible="1" />
+                            <field name="as_product_insig" invisible="1" />
                             <button name="action_invoice_supplier" string="Generar Factura" icon="fa-file-text"
                                 type="object" states='draft,transfer' />
                             <button name="action_create_picking" string="Transferir a Logistica" icon="fa-sign-out"
@@ -62,12 +62,17 @@
                         </tree>
                     </field>
                 </page>
-                  <page string="Diseño" name="diseno">
+                <page string="Diseño" name="diseno">
+                    <group col="4">
+                        <field name="cantidad" />
+                        <button name="action_obtener_propuesta" string="Obtener" type="object" />
+                    </group>
                     <field name="line_propuesta">
-                        <tree create="1" editable="bottom">
-                            <field name="propuesta" widget="image" width="150px" height="150px"/>
-                            <field name="observaciones"/>
-                            <field name="state"/>
+                        <tree editable="bottom" >
+                            <field name="product_id" />
+                            <field name="propuesta" widget="image" width="150px" height="150px" />
+                            <field name="observaciones" />
+                            <field name="state" />
                         </tree>
                     </field>
                 </page>
@@ -87,11 +92,11 @@
                 <field name="location_app_dest_id" />
                 <field name="location_app_id" />
                 <field name="state_purchase" />
-                <field name="picking_ids" widget="many2many_tags"/>
+                <field name="picking_ids" widget="many2many_tags" />
                 <field name="date_purchase" />
                 <field name="total_compra" />
-                <field name="state" />
-              
+                <field name="state" invisible="1" />
+
 
             </tree>
         </field>

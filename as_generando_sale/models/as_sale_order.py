@@ -31,8 +31,22 @@ class as_SaleOrder(models.Model):
         'Image Sizes', default="image_small",
         help="Image size to be displayed in report")
     line_propuesta = fields.One2many('as.propuesta', 'sale_id', string="Lineas de Propueta",store=True)
+    cantidad = fields.Char(string='Numero Propuesta por Producto')
 
-    
+    @api.multi 
+    def action_obtener_propuesta(self):
+        line_propuesta = self.env['as.propuesta']
+        for line in self.order_line:
+            lines = []
+            if line.product_id.type=='product':
+                for line_product in range(0,int(self.cantidad)):
+                    line_propuesta.create({
+                        'as_propuesta_id': line_propuesta.id,
+                        'product_id': line.product_id.id,
+                        'sale_id' : self.id,
+                        'propuesta_ids' : lines,
+                    })
+
     @api.multi
     def update_create_picking(self):
         for pick in self.picking_ids:
@@ -158,9 +172,9 @@ class AsSalesPurchase(models.Model):
     as_invoice_id = fields.Many2one('account.invoice', string="Factura", copy=False)
     as_invoice_id_done = fields.Boolean( string="producto Insignea", defaul=False)
     as_product_insig = fields.Boolean( string="producto Insignea", defaul=False)
-    state_purchase = fields.Selection([('draft', 'RFQ'),('sent', 'RFQ Sent'),('to approve', 'To Approve'),('purchase', 'Purchase Order'),('done', 'Locked'),('cancel', 'Cancelled')], string='Status Compra', readonly=True, default='draft',store=True, related='purchase_id.state')
+    state_purchase = fields.Selection([('draft', 'RFQ'),('sent', 'RFQ Sent'),('to approve', 'To Approve'),('purchase', 'Purchase Order'),('done', 'Locked'),('cancel', 'Cancelled')], string='Estado Compra', readonly=True, default='draft',store=True, related='purchase_id.state')
     #datos de compra
-    date_purchase = fields.Datetime(string='Purchase Date',related='purchase_id.date_order')
+    date_purchase = fields.Datetime(string='Fecha Compra',related='purchase_id.date_order')
     total_compra = fields.Monetary(string='Total Compra',related='purchase_id.amount_total')
     picking_ids = fields.Many2many('stock.picking', compute='_compute_picking', string='Orden de Entrega',related='purchase_id.picking_ids')
     #campos d efactura
@@ -174,6 +188,7 @@ class AsSalesPurchase(models.Model):
     amount_total = fields.Monetary(string='Impuesto no Incluido',related='as_invoice_id.amount_total')
     residual = fields.Monetary(string='A pagar',related='as_invoice_id.residual')
     state_invoice = fields.Selection([('draft', 'Draft'),('open', 'Open'),('paid', 'Paid'),('cancel', 'Cancelled')], string='Invoice Status',related='as_invoice_id.state')
+
 
     def _compute_picking(self):
         for lines in self:
@@ -214,10 +229,6 @@ class AsSalesPurchase(models.Model):
                     'sale_line_id' : line.id,
                 }
                 line_id = self.env['stock.move'].create(vals)
-        # sp2.action_confirm()as_product_insig
-        # wiz_id = self.env['stock.immediate.transfer'].with_context(active_ids=sp2.ids, active_id=sp2.id, default_pick_id=sp2.id).create({'pick_id': sp2.id})
-        # wiz_id.process()
-        # sp2.button_validate()
         self.write({
             'state': 'transfer',
             'picking_id': sp2.id,
@@ -229,7 +240,6 @@ class AsSalesPurchase(models.Model):
                 'partner_id': self.partner_app_id.id,
                 'state_purchase': self.purchase_id.state,
                 'location_app_dest_id': sp2.location_dest_id.id,
-                'as_product_insig': True,
             }
         line  = self.create(vals)
         return True
@@ -266,9 +276,14 @@ class AsSalesPurchase(models.Model):
         lines_invoice = []
         invoice = self.env['account.invoice'].create({
             'partner_id': self.partner_app_id.id,
+            'type': 'in_invoice',
+            'origin': self.purchase_id.name,
             'account_id': self.partner_app_id.property_account_payable_id.id,
         })
+        taxes = []
         for line in self.sale_id.order_line:
+            for tax in line.tax_id:
+                taxes.append(tax.id)
             if line.product_id.type == 'product':
                 self.env['account.invoice.line'].create({
                     'invoice_id': invoice.id,
@@ -276,8 +291,8 @@ class AsSalesPurchase(models.Model):
                     'name': line.product_id.product_tmpl_id.name,
                     'quantity' : line.product_uom_qty,
                     'price_unit' : line.price_unit,
+                    'invoice_line_tax_ids' :  [(6, 0, taxes)],
                 })
-        invoice.action_invoice_open()
         self.as_invoice_id = invoice.id
         self.as_invoice_id_done = True
         return True
@@ -286,6 +301,7 @@ class AsSalesPurchase(models.Model):
     _name = 'as.propuesta'
 
     sale_id = fields.Many2one('sale.order', string="Sale Order")
+    product_id = fields.Many2one('product.product', string="Producto")
     propuesta = fields.Binary(string ='Propuesta')
     state = fields.Selection([('aprobado', 'Aprobado'),('re-trabajar', 'Re-Trabajar'),('no-aplica', 'No Aplica')], string='Status')
     observaciones = fields.Char(string ='Observaciones')
