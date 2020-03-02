@@ -72,15 +72,24 @@ class as_importar_productos(models.Model):
         return list(islice(iterable, n))
 
     @api.multi
-    def update_product(self, ids, values):
-        product_obj = self.env['product.product'].search([('id','=',ids.id)],limit=1)
-        ids.update({
-            'as_costo_anterior':product_obj.as_costo_proveedor
-        })
+    def update_product(self):
+        # product_obj = self.env['product.product'].search([('id','=',ids.id)],limit=1)
+        # ids.update({
+        #     'as_costo_anterior':product_obj.as_costo_proveedor
+        # })
+
+        self.env.cr.execute("""
+            select pp.id, pt.name, pt.as_codigo_proveedor, pt.as_costo_proveedor, pt.as_costo_anterior, pt.as_name_proveedor, pt.as_existencias, pt.list_price, pt.as_factor, pt.as_descontinuado from product_product pp, product_template pt where tf_check_update = 'no_update' and pp.product_tmpl_id = pt.id limit %s
+        """%self.as_iteracion)
+        result = self.env.cr.dictfetchall()
+
         vals = {
             'name':values.get('NOMPROD'),
             'as_codigo_proveedor':values.get('CODPROD'),
             'as_costo_proveedor':float(values.get('COSUNIT')),
+
+            'as_costo_anterior': float(values.get('COSUNIT')),
+
             'as_name_proveedor':values.get('PROVEEDOR'),
             'as_existencias':values.get('EXISTENCIAS'),
             'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
@@ -108,7 +117,7 @@ class as_importar_productos(models.Model):
             'sale_ok':True,
             'purchase_ok':True,
             'as_costo_anterior':float(0.00),
-            
+            'tf_check_update': 'no_update',
             # 'default_code':values.get('PROVEEDOR'),
         }
         # _logger.debug("Valores create_product: %s", str(vals))
@@ -121,7 +130,7 @@ class as_importar_productos(models.Model):
                 return productos
         return False
 
-    def importar_productos(self):
+    def importar_productos(self, value):
         self.descontinuar()
         importar = self.env['as.importar.productos'].search([('as_activo','=', True)])
         for operacion in importar:
@@ -143,37 +152,119 @@ class as_importar_productos(models.Model):
                 total_elapsed = 0
                 nro_orders = len(jsondata)
 
-                productos = self.env['product.product'].search([])
-                
-                for value in jsondata:
-                    # Inicializar tiempo
-                    count += 1
-                    elapsed = 0
-                    start = time.time()
-                    time.clock() 
-                    
-                    if value:
-                        product_ids = self.env['product.product'].search([('as_codigo_proveedor','=', value.get('CODPROD'))],limit=1)
-                        # product_ids = self.obtener_producto(productos,value.get('CODPROD'))
-                        if product_ids:
-                            res = self.update_product(product_ids,value)
-                            tipo_operacion = 'UPDATE'
-                        else:
+
+
+
+
+
+
+                if value.get('create_tf'):
+                    self.env.cr.execute("""select as_codigo_proveedor from product_template """)
+                    product_result = self.env.cr.dictfetchall()
+
+                    productos = [x['as_codigo_proveedor'] for x in product_result]
+
+                    new_json_data = [y for y in jsondata if y['CODPROD'] not in productos]
+                    for value in new_json_data:
+                        # Inicializar tiempo
+
+                        elapsed = 0
+                        start = time.time()
+                        time.clock()
+
+                        if value:
+                            # product_ids = self.env['product.product'].search([('as_codigo_proveedor','=', value.get('CODPROD'))],limit=1)
+                            # product_ids = self.obtener_producto(productos,value.get('CODPROD'))
+                            # if product_ids:
+                            #     res = self.update_product(product_ids,value)
+                            #     tipo_operacion = 'UPDATE'
+                            # else:
                             res = self.create_product(value)
-                            tipo_operacion = 'CREATE'                    
-                            # raise Warning(_('"%s" Product not found.') % values.get('default_code'))
-                    
-                    # Escribir cada cierta iteracion
-                    if count == operacion.as_iteracion:
-                        self.env.cr.commit()
-                        count = 0
-                        
-                    # Tiempo transcurrido
-                    elapsed = round((time.time() - start),2)
-                    total_elapsed = elapsed + total_elapsed
-                    counter = counter + 1
-                    percentage = round(float(counter) / nro_orders * 100,2)
-                    _logger.info("\n\nNro: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s", counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed, round((total_elapsed/60),2))
+                            tipo_operacion = 'CREATE'
+                            count += 1
+                                # raise Warning(_('"%s" Product not found.') % values.get('default_code'))
+
+                        # Escribir cada cierta iteracion
+                        if count == operacion.as_iteracion:
+                            self.env.cr.commit()
+                            break
+                            count = 0
+
+                        # Tiempo transcurrido
+                        elapsed = round((time.time() - start),2)
+                        total_elapsed = elapsed + total_elapsed
+                        counter = counter + 1
+                        percentage = round(float(counter) / nro_orders * 100,2)
+
+                        # if counter == operacion.as_iteracion:
+                        #     break
+
+                        _logger.info("\n\nNro: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s", counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed, round((total_elapsed/60),2))
+
+                elif value.get('update_tf'):
+
+                    self.env.cr.execute("""select as_codigo_proveedor from product_template """)
+                    product_result = self.env.cr.dictfetchall()
+
+                    productos = [x['as_codigo_proveedor'] for x in product_result]
+
+                    old_json_data = [z for z in jsondata if z['CODPROD'] in productos]
+
+                    self.env.cr.execute("""
+                                select pp.id, pt.name, pt.as_codigo_proveedor, pt.as_costo_proveedor, pt.as_costo_anterior, pt.as_name_proveedor, pt.as_existencias, pt.list_price, pt.as_factor, pt.as_descontinuado from product_product pp, product_template pt where tf_check_update = 'no_update' and pp.product_tmpl_id = pt.id limit %s
+                            """ % (self.as_iteracion+150))
+                    result = self.env.cr.dictfetchall()
+                    count = 1
+                    _logger.info('Updating Started')
+                    for value in result:
+
+                        search_res = [x for x in old_json_data if x['CODPROD'] == value['as_codigo_proveedor']]
+                        if search_res:
+                            values = search_res[0]
+                            pro_id = self.env['product.product'].browse(value['id']).write({
+                                'name':values.get('NOMPROD'),
+                                'as_codigo_proveedor':values.get('CODPROD'),
+                                'as_costo_proveedor':float(values.get('COSUNIT')),
+                                'as_existencias':values.get('EXISTENCIAS'),
+                                'as_name_proveedor':values.get('PROVEEDOR'),
+                                'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
+                                'as_factor':float(self.as_factor),
+                                'as_descontinuado':False,
+                                'sale_ok':True,
+                                'purchase_ok':True,
+                                'as_costo_anterior':float(0.00),
+                                'tf_check_update': 'update',
+                                # 'default_code':values.get('PROVEEDOR'),
+                            })
+
+
+                            _logger.info('Update number %s'%str(count))
+                            _logger.info('Product Info')
+                            _logger.info(pro_id)
+                            count+=1
+
+                    if not result:
+                        _logger.info('All Product set to state no update!')
+                        self.env.cr.execute("""update product_template set tf_check_update = 'no_update';""")
+
+                    # start = time.time()
+                    # time.clock()
+                    self.env.cr.commit()
+
+                    # elapsed = round((time.time() - start), 2)
+                    # total_elapsed = elapsed + total_elapsed
+                    # counter = counter + 1
+                    # percentage = round(float(counter) / nro_orders * 100, 2)
+
+                    # if counter == operacion.as_iteracion:
+                    #     break
+
+                    # _logger.info(
+                    #     "\n\nNro: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s",
+                    #     counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed,
+                    #     round((total_elapsed / 60), 2))
+
+
 
                 operacion.as_resultado = True
                 
@@ -205,7 +296,7 @@ class as_importar_productos(models.Model):
 
 
                 # body += 
-                operacion.message_post(body = body, content_subtype='html')
+                operacion.message_post(body = body)
 
             else:
                 raise ValidationError(

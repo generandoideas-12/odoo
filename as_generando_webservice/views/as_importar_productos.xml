@@ -8,8 +8,9 @@
             <field name="arch" type="xml">
                 <form string="Importador de Productos">
                     <header>
-                        <button name="importar_productos" string="Importar" class="oe_highlight" type="object" confirm="El proceso de importacion puede tardar algunos minutos, procedemos?"/>
-                        <button name="activar" string="Activar" class="oe_highlight" type="object" confirm="Esta tarea de importacion sera planificada para ejecutarse, procedemos?"/>
+                        <button name="importar_productos" context="{'create_tf': 'create'}" string="Importar" class="oe_highlight" type="object"/>
+                        <button name="importar_productos" context="{'update_tf': 'update'}" string="Update" class="oe_highlight" type="object"/>
+                        <button name="activar" string="Activar" class="oe_highlight" type="object"/>
                     </header>
                     <sheet string="Importador de Productos">
                         <group>
