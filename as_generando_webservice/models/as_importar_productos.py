@@ -185,10 +185,10 @@ class as_importar_productos(models.Model):
                                 # raise Warning(_('"%s" Product not found.') % values.get('default_code'))
 
                         # Escribir cada cierta iteracion
-                        if count == operacion.as_iteracion:
-                            self.env.cr.commit()
-                            break
-                            count = 0
+                        # if count == operacion.as_iteracion:
+                        #     self.env.cr.commit()
+                        #     break
+                        #     count = 0
 
                         # Tiempo transcurrido
                         elapsed = round((time.time() - start),2)
@@ -214,9 +214,17 @@ class as_importar_productos(models.Model):
                                 select pp.id, pt.name, pt.as_codigo_proveedor, pt.as_costo_proveedor, pt.as_costo_anterior, pt.as_name_proveedor, pt.as_existencias, pt.list_price, pt.as_factor, pt.as_descontinuado from product_product pp, product_template pt where tf_check_update = 'no_update' and pp.product_tmpl_id = pt.id limit %s
                             """ % (self.as_iteracion+150))
                     result = self.env.cr.dictfetchall()
+                    
                     count = 1
+                    
                     _logger.info('Updating Started')
                     for value in result:
+
+                        elapsed = 0
+                        start = time.time()
+                        time.clock()
+                        tipo_operacion = 'UPDATE'
+                        
 
                         search_res = [x for x in old_json_data if x['CODPROD'] == value['as_codigo_proveedor']]
                         if search_res:
@@ -237,11 +245,18 @@ class as_importar_productos(models.Model):
                                 # 'default_code':values.get('PROVEEDOR'),
                             })
 
-
-                            _logger.info('Update number %s'%str(count))
-                            _logger.info('Product Info')
-                            _logger.info(pro_id)
+                            # _logger.info('Update number %s'%str(count))
+                            # _logger.info('Product Info')
+                            # _logger.info(pro_id)
                             count+=1
+
+                        # Tiempo transcurrido
+                        elapsed = round((time.time() - start),2)
+                        total_elapsed = elapsed + total_elapsed
+                        counter = counter + 1
+                        percentage = round(float(counter) / nro_orders * 100,2)                            
+
+                        _logger.info("\n\nNro: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s", counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed, round((total_elapsed/60),2))
 
                     if not result:
                         _logger.info('All Product set to state no update!')
@@ -249,7 +264,7 @@ class as_importar_productos(models.Model):
 
                     # start = time.time()
                     # time.clock()
-                    self.env.cr.commit()
+                    # self.env.cr.commit()
 
                     # elapsed = round((time.time() - start), 2)
                     # total_elapsed = elapsed + total_elapsed
@@ -278,21 +293,21 @@ class as_importar_productos(models.Model):
                 # table = table.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
                 # body += "<b>REST Importados: </b></br>%s <br>" %(table)
                 
-                table_diferencias = tabulate(self.as_diferencias(jsondata),headers,tablefmt='html')
-                table_diferencias = table_diferencias.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
-                body += "<b>DIFERENCIA entre DB LOCAL y Remoto: </b></br>%s <br>" %(table_diferencias)
+                # table_diferencias = tabulate(self.as_diferencias(jsondata),headers,tablefmt='html')
+                # table_diferencias = table_diferencias.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                # body += "<b>DIFERENCIA entre DB LOCAL y Remoto: </b></br>%s <br>" %(table_diferencias)
                 
-                table_unicos = tabulate(self.as_remover_duplicados(jsondata),headers,tablefmt='html')
-                table_unicos = table_unicos.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
-                body += "<b>REST Importados Unicos: </b></br>%s <br>" %(table_unicos)
+                # table_unicos = tabulate(self.as_remover_duplicados(jsondata),headers,tablefmt='html')
+                # table_unicos = table_unicos.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                # body += "<b>REST Importados Unicos: </b></br>%s <br>" %(table_unicos)
                 
-                table_duplicados = tabulate(self.as_duplicados(jsondata),headers,tablefmt='html')
-                table_duplicados = table_duplicados.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
-                body += "<b>REST Importados Duplicados: </b></br>%s <br>" %(table_duplicados)
+                # table_duplicados = tabulate(self.as_duplicados(jsondata),headers,tablefmt='html')
+                # table_duplicados = table_duplicados.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                # body += "<b>REST Importados Duplicados: </b></br>%s <br>" %(table_duplicados)
                                 
-                table_duplicados_local = tabulate(self.as_repetidos(),headers,tablefmt='html')
-                table_duplicados_local = table_duplicados_local.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
-                body += "<b>DB Duplicados: </b></br>%s <br>" %(table_duplicados_local)
+                # table_duplicados_local = tabulate(self.as_repetidos(),headers,tablefmt='html')
+                # table_duplicados_local = table_duplicados_local.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
+                # body += "<b>DB Duplicados: </b></br>%s <br>" %(table_duplicados_local)
 
 
                 # body += 
