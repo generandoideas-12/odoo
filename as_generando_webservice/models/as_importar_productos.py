@@ -395,7 +395,7 @@ class as_importar_productos(models.Model):
         return df_1notin2
 
     def as_eliminar_adjuntos(self,operacion):
-        self.env['ir.attachment'].search([('res_model','=','as.importar.productos'),('res_id','=',operacion.id)]).unlink()
+        self.env['ir.attachment'].search([('res_model','=','as.importar.productos'),('res_id','=',self.id)]).unlink()
     
     def as_generar_csv(self,x,filename):
         archivo = StringIO()
