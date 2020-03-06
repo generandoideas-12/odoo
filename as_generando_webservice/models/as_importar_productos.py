@@ -326,20 +326,20 @@ class as_importar_productos(models.Model):
                 # table_duplicados = table_duplicados.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
                 # body += "<b>REST Importados Duplicados: </b></br>%s <br>" %(table_duplicados)
                 ## Crear CSV
-                table_duplicados = self.as_duplicados(jsondata)
-                attach_id4 = self.as_generar_csv2(table_duplicados,"table_duplicados" + str(operacion.id) + ".csv",True)
-                attach_url4 = "<a href='/web/content/" + str(attach_id4.id) + "?download=true' download='REST Importados Duplicados " + str(attach_id4.id) + "'>REST Importados Duplicados " + str(attach_id4.id) + "</a>"
-                body += "<b>REST Importados Duplicados: </b></br>%s <br>" %(attach_url4)
+                # table_duplicados = self.as_duplicados(jsondata)
+                # attach_id4 = self.as_generar_csv2(table_duplicados,"table_duplicados" + str(operacion.id) + ".csv",True)
+                # attach_url4 = "<a href='/web/content/" + str(attach_id4.id) + "?download=true' download='REST Importados Duplicados " + str(attach_id4.id) + "'>REST Importados Duplicados " + str(attach_id4.id) + "</a>"
+                # body += "<b>REST Importados Duplicados: </b></br>%s <br>" %(attach_url4)
                 
                 ## LOCAL DUPLICADOS
                 # table_duplicados_local = tabulate(self.as_repetidos(),headers,tablefmt='html')
                 # table_duplicados_local = table_duplicados_local.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
                 # body += "<b>DB Duplicados: </b></br>%s <br>" %(table_duplicados_local)
                 ## Crear CSV
-                table_duplicados_local = self.as_repetidos()
-                attach_id5 = self.as_generar_csv2(table_duplicados_local,"table_duplicados_local" + str(operacion.id) + ".csv",False)
-                attach_url5 = "<a href='/web/content/" + str(attach_id5.id) + "?download=true' download='DB Duplicados " + str(attach_id5.id) + "'>DB Duplicados " + str(attach_id5.id) + "</a>"
-                body += "<b>DB Duplicados: </b></br>%s <br>" %(attach_url5)
+                # table_duplicados_local = self.as_repetidos()
+                # attach_id5 = self.as_generar_csv2(table_duplicados_local,"table_duplicados_local" + str(operacion.id) + ".csv",False)
+                # attach_url5 = "<a href='/web/content/" + str(attach_id5.id) + "?download=true' download='DB Duplicados " + str(attach_id5.id) + "'>DB Duplicados " + str(attach_id5.id) + "</a>"
+                # body += "<b>DB Duplicados: </b></br>%s <br>" %(attach_url5)
 
                 # body += 
                 operacion.message_post(body = body)
