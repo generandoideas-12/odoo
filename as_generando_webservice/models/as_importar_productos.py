@@ -135,7 +135,7 @@ class as_importar_productos(models.Model):
         return False
 
     def importar_productos(self, value):
-        self.descontinuar()
+        # self.descontinuar()
         importar = self.env['as.importar.productos'].search([('as_activo','=', True)])
         for operacion in importar:
             response = requests.get(operacion.as_url,auth=requests.auth.HTTPBasicAuth(operacion.as_login,operacion.as_password))
