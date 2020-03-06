@@ -195,6 +195,7 @@ class AsSalesPurchase(models.Model):
     residual = fields.Monetary(string='A pagar',related='as_invoice_id.residual')
     state_invoice = fields.Selection([('draft', 'Draft'),('open', 'Open'),('paid', 'Paid'),('cancel', 'Cancelled')], string='Invoice Status',related='as_invoice_id.state')
     state_picking = fields.Selection(string='Estado Movimiento', selection=[('draft', 'Draft'),('cancel', 'Cancelled'), ('confirm', 'In Progress'),('done', 'Validated')], readonly=True,default='draft',related='picking_id.state')
+    scheduled_date = fields.Datetime('Fecha Movimiento', store=True,index=True,related='picking_id.scheduled_date')
 
 
     def _compute_picking(self):
