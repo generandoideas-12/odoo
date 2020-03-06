@@ -41,5 +41,4 @@ class MsQuery(models.Model):
             self.result = '%d row affected'%(self._cr.rowcount)
         else :
             self.result = 'Successful'
-        msg = '%s<br><br>Executed on %s'%(self.name,str(self.get_real_datetime())[:19])
-        self.message_post(body=msg)
+        #self.message_post('%s<br><br>Executed on %s'%(self.name,str(self.get_real_datetime())[:19]))
