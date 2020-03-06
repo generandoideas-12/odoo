@@ -11,14 +11,11 @@
                         <button name="importar_productos" context="{'create_tf': 'create'}" string="Importar" class="oe_highlight" type="object"/>
                         <button name="importar_productos" context="{'update_tf': 'update'}" string="Update" class="oe_highlight" type="object"/>
                         <button name="activar" string="Activar" class="oe_highlight" type="object"/>
-                        <button name="as_eliminar_adjuntos" string="Eliminar Adjuntos" class="oe_highlight" type="object"/>
-                        
                     </header>
                     <sheet string="Importador de Productos">
                         <group>
                             <field name="name"/>
                             <field name="as_url"/>
-                            <field name="as_url_full"/>
                             <field name="as_login"/>
                             <field name="as_password"/>
                             <field name="as_iteracion"/>

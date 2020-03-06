@@ -14,6 +14,7 @@
                     <field name="as_name_proveedor"/>
                     <field name="as_existencias" />
                     <field name="as_factor"/>
+                    <field name="as_descontinuado" readonly="True"  force_save="1" />
                 </field>
             </field>
         </record>
