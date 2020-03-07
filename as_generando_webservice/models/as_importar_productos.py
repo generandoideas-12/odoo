@@ -344,9 +344,9 @@ class as_importar_productos(models.Model):
                 # body += 
                 operacion.message_post(body = body)
 
-            else:
-                raise ValidationError(
-                    _("Valor en 'Catalogo JSON' Incorrecto: " + operacion.as_catalogo))
+            # else:
+            #     raise ValidationError(
+            #         _("Valor en 'Catalogo JSON' Incorrecto: " + operacion.as_catalogo))
                 
     # LOCAL Repetidos 
     def as_repetidos(self):
