@@ -3,7 +3,7 @@
     "summary": "Importador de Productos",
     "category": "crm",
     "images": [],
-    "version": "1.0.6",
+    "version": "1.0.7",
     "application": True,
     "author": "Ahorasoft",
     "support": "soporte@ahorasoft.com",

@@ -284,11 +284,7 @@ class as_importar_productos(models.Model):
                     #     counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed,
                     #     round((total_elapsed / 60), 2))
 
-
-
                 operacion.as_resultado = True
-                
-                
                 
                 body =  "<b>Total Productos Remotos: </b>%s <br>" %(len(jsondata))
                 body += "<b>Total Productos Locales: </b>%s <br>" %(str(self.as_total_productos_actuales()))
