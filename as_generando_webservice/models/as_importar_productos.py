@@ -136,8 +136,16 @@ class as_importar_productos(models.Model):
 
     def importar_productos(self, value):
         # self.descontinuar()
-        importar = self.env['as.importar.productos'].search([('as_activo','=', True)])
+        importar = self.env['as.importar.productos'].search([('as_activo','=', True)],order="write_date asc", limit=1)
+        
+        
         for operacion in importar:
+            # marcar fecha como procesado
+            today = fields.Datetime.now(self)
+            operacion.write_date = today
+            self.env.cr.commit()
+            
+            # procesar URL
             response = requests.get(operacion.as_url,auth=requests.auth.HTTPBasicAuth(operacion.as_login,operacion.as_password))
             jsondata = json.loads(response.text)
             
@@ -339,8 +347,11 @@ class as_importar_productos(models.Model):
 
                 # body += 
                 operacion.message_post(body = body)
-
-            # else:
+            
+            else:
+                # operacion.write_date = today
+                operacion.as_resultado = False
+                # operacion.as_activo = True
             #     raise ValidationError(
             #         _("Valor en 'Catalogo JSON' Incorrecto: " + operacion.as_catalogo))
                 
