@@ -15,6 +15,7 @@
         'sale_management',
         'purchase',
         'report_xlsx',
+        'sale_purchase',
     ],
     'data': [
         'views/as_importar_productos.xml',

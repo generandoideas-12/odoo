@@ -3,7 +3,7 @@
 {
     'name': 'Ahorasoft Sale MRP Link',
     'summary': 'Show manufacturing orders generated from sales order',
-    'version': '12.0.1.0.0',
+    'version': '1.1',
     # 'development_status': 'Production/Stable',
     'category': 'Sales Management',
     'website': 'http://ahorasoft.com',

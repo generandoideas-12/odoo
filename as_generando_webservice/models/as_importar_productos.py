@@ -113,6 +113,7 @@ class as_importar_productos(models.Model):
             'name':values.get('NOMPROD'),
             'as_codigo_proveedor':values.get('CODPROD'),
             'as_costo_proveedor':float(values.get('COSUNIT')),
+            # 'standard_price':float(values.get('COSUNIT')),
             'as_existencias':values.get('EXISTENCIAS'),
             'as_name_proveedor':values.get('PROVEEDOR'),
             'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
@@ -243,6 +244,7 @@ class as_importar_productos(models.Model):
                                 'name':values.get('NOMPROD'),
                                 'as_codigo_proveedor':values.get('CODPROD'),
                                 'as_costo_proveedor':float(values.get('COSUNIT')),
+                                # 'standard_price':float(values.get('COSUNIT')),
                                 'as_existencias':values.get('EXISTENCIAS'),
                                 'as_name_proveedor':values.get('PROVEEDOR'),
                                 'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
@@ -250,7 +252,7 @@ class as_importar_productos(models.Model):
                                 'as_descontinuado':False,
                                 'sale_ok':True,
                                 'purchase_ok':True,
-                                'as_costo_anterior':float(0.00),
+                                'as_costo_anterior':float(value['as_costo_proveedor']),
                                 'tf_check_update': 'update',
                                 # 'default_code':values.get('PROVEEDOR'),
                             })
@@ -271,7 +273,7 @@ class as_importar_productos(models.Model):
                             counter = counter + 1
                             percentage = round(float(counter) / nro_orders * 100,2)
 
-                            _logger.info("\n\nNro: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s URL: %s", counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed, round((total_elapsed/60),2), operacion.as_url)
+                            _logger.info("\n\nNro: %s Producto: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s URL: %s", counter, value['name'], tipo_operacion, percentage, value.get('CODPROD'), elapsed, round((total_elapsed/60),2), operacion.as_url)
 
                     if not result:
                         _logger.info('All Product set to state no update!')

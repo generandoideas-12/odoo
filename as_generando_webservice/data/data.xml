@@ -3,7 +3,7 @@
         <record id="as_cron_scheduler_importar_productos" model="ir.cron">
             <field name="name">As Scheduler - Importar productos de Endpoint</field>
             <field name="user_id" ref="base.user_root"/>
-            <field name="interval_number">20</field>
+            <field name="interval_number">60</field>
             <field name="interval_type">minutes</field>
             <field name="numbercall">-1</field>
             <field name="model_id" ref="model_as_importar_productos"/>
@@ -15,7 +15,7 @@
         <record id="as_cron_scheduler_importar_productos_update" model="ir.cron">
             <field name="name">As Scheduler - Update productos de Endpoint</field>
             <field name="user_id" ref="base.user_root"/>
-            <field name="interval_number">40</field>
+            <field name="interval_number">5</field>
             <field name="interval_type">minutes</field>
             <field name="numbercall">-1</field>
             <field name="model_id" ref="model_as_importar_productos"/>
