@@ -3,7 +3,7 @@
     "summary": "Nucleo para Ventas",
     "category": "crm",
     "images": [],
-    "version": "1.1.3",
+    "version": "1.1.4",
     "application": True,
     "author": "Ahorasoft",
     "support": "soporte@ahorasoft.com",

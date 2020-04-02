@@ -40,7 +40,7 @@
                         <t t-if="not line['display_type']">
                             <td style='width:40%'>
                                 <span t-esc="line['name']" /><br />
-                                Materifal: <span t-esc="line['material']" /><br />
+                                Material: <span t-esc="line['material']" /><br />
                                 Medidas: <span t-esc="line['medidas']" /><br />
                                 <t t-if="line['aplicacion'] != ''">
                                     Aplicacion: <span t-esc="line['aplicacion']" />
