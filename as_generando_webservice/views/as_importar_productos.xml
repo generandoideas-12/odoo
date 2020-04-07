@@ -12,6 +12,7 @@
                         <button name="importar_productos" context="{'update_tf': 'update'}" string="Actualizar" class="oe_highlight" type="object"/>
                         <button name="activar" string="Activar" class="oe_highlight" type="object"/>
                         <button name="as_eliminar_adjuntos" string="Eliminar Adjuntos" class="oe_highlight" type="object"/>
+                        <button name="desactivar" string="Desactivar Todo" class="oe_highlight" type="object"/>
                         
                     </header>
                     <sheet string="Importador de Productos">

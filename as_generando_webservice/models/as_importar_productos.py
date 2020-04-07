@@ -63,6 +63,13 @@ class as_importar_productos(models.Model):
         """
         self.env.cr.execute(query)
 
+    def desactivar(self):
+        query = """
+            UPDATE as_importar_productos
+                SET as_activo = False
+        """
+        self.env.cr.execute(query)        
+
     def validacion_numero(self,valor, tipo):
         try:
             resultado = tipo(valor)
@@ -173,28 +180,21 @@ class as_importar_productos(models.Model):
                 if value.get('create_tf'):
                     self.env.cr.execute("""select as_codigo_proveedor from product_template """)
                     product_result = self.env.cr.dictfetchall()
-
                     productos = [x['as_codigo_proveedor'] for x in product_result]
 
+                    # Obtener nuevos productos
                     new_json_data = [y for y in jsondata if y['CODPROD'] not in productos]
                     for value in new_json_data:
+                        
                         # Inicializar tiempo
-
                         elapsed = 0
                         start = time.time()
                         time.clock()
 
                         if value:
-                            # product_ids = self.env['product.product'].search([('as_codigo_proveedor','=', value.get('CODPROD'))],limit=1)
-                            # product_ids = self.obtener_producto(productos,value.get('CODPROD'))
-                            # if product_ids:
-                            #     res = self.update_product(product_ids,value)
-                            #     tipo_operacion = 'UPDATE'
-                            # else:
                             res = self.create_product(value)
                             tipo_operacion = 'CREATE'
                             count += 1
-                                # raise Warning(_('"%s" Product not found.') % values.get('default_code'))
 
                             # Escribir cada cierta iteracion
                             if count == operacion.as_iteracion:
@@ -206,9 +206,6 @@ class as_importar_productos(models.Model):
                         total_elapsed = elapsed + total_elapsed
                         counter = counter + 1
                         percentage = round(float(counter) / nro_orders * 100,2)
-
-                        # if counter == operacion.as_iteracion:
-                        #     break
 
                         _logger.info("\n\nNro: %s Operacion: %s Porcentaje: %s Registro confirmado: %s Segundos: %s TOTAL TIEMPO: %s URL: %s", counter, tipo_operacion, percentage, value.get('CODPROD'), elapsed, round((total_elapsed/60),2), operacion.as_url)
 
@@ -228,7 +225,7 @@ class as_importar_productos(models.Model):
                     
                     count = 1
                     
-                    _logger.info('Updating Started')
+                    # _logger.info('Updating Started')
                     for value in result:
 
                         elapsed = 0
@@ -257,10 +254,6 @@ class as_importar_productos(models.Model):
                                 # 'default_code':values.get('PROVEEDOR'),
                             })
 
-                            # _logger.info('Update number %s'%str(count))
-                            # _logger.info('Product Info')
-                            # _logger.info(pro_id)
-                            
                             # Escribir cada cierta iteracion
                             if count == operacion.as_iteracion:
                                 self.env.cr.commit()
@@ -307,6 +300,13 @@ class as_importar_productos(models.Model):
                 # table = table.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
                 body += "<b>Datos REST Importados: </b></br>%s <br>" %(attach_url)
                 
+                ## NUEVOS PRODUCTOS
+                if value.get('create_tf'):
+                    nuevos_productos = self.as_diferencias(new_json_data)
+                    attach_id6 = self.as_generar_csv2(nuevos_productos,"nuevos_productos" + str(operacion.id) + ".csv",True)
+                    attach_url6 = "<a href='/web/content/" + str(attach_id6.id) + "?download=true' download='Nuevos Productos JSON " + str(attach_id6.id) + "'>Nuevos Productos JSON " + str(attach_id6.id) + "</a>"
+                    body += "<b>Nuevos Productos: </b></br>%s <br>" %(attach_url6)
+
                 ## DIFERENCIAS
                 # table_diferencias = tabulate(self.as_diferencias(jsondata),headers,tablefmt='html')
                 # table_diferencias = table_diferencias.replace('<table>', '<table class="oe_list_content" border="1" style="border-collapse:collapse;">')
@@ -437,7 +437,7 @@ class as_importar_productos(models.Model):
                 x["NOMPROD"],
                 x["COSUNIT"],
                 x["EXISTENCIAS"],
-                x["PROVEEDOR"],
+                # x["PROVEEDOR"],
             ])
             
         # file_data = f.read()
@@ -491,3 +491,63 @@ class as_importar_productos(models.Model):
         })
         
         return attach_id
+
+class as_importar_productos_check(models.Model):
+    _name = "as.importar.productos.check"
+    _description = 'Importador de Productos Verificador'
+    _inherit = ['mail.thread']
+    _order = "write_date desc"
+
+    name = fields.Char(string='NOMPROD')
+    as_codigo_proveedor = fields.Char(string="CODPROD")
+    as_costo_proveedor = fields.Float(string="COSUNIT", default=0)
+    as_existencias = fields.Float(string="EXISTENCIAS", default=0)
+    as_name_proveedor = fields.Char(string="PROVEEDOR")
+    list_price = fields.Char(string='COSUNIT')
+    as_factor = fields.Float('FACTOR PRECIO', default=1)
+    as_descontinuado = fields.Boolean('DESCONTINUADO', default=True)
+    as_costo_anterior = fields.Float(string="COSTO ANTERIOR", default=0)
+    tf_check_update = fields.Char(string='ACTUALIZADO')
+
+    @api.multi
+    def update_product(self):
+
+        vals = {
+            'name':values.get('NOMPROD'),
+            'as_codigo_proveedor':values.get('CODPROD'),
+            'as_costo_proveedor':float(values.get('COSUNIT')),
+
+            'as_costo_anterior': float(values.get('COSUNIT')),
+
+            'as_name_proveedor':values.get('PROVEEDOR'),
+            'as_existencias':values.get('EXISTENCIAS'),
+            'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
+            'as_factor':float(self.as_factor),
+            'as_descontinuado':False,
+        }
+        # _logger.debug("Valores create_product: %s", str(vals))
+        res = ids.update(vals)
+        return res
+    
+    @api.multi
+    def create_product(self, values):
+        product_obj = self.env['product.product']
+        vals = {
+            'name':values.get('NOMPROD'),
+            'as_codigo_proveedor':values.get('CODPROD'),
+            'as_costo_proveedor':float(values.get('COSUNIT')),
+            # 'standard_price':float(values.get('COSUNIT')),
+            'as_existencias':values.get('EXISTENCIAS'),
+            'as_name_proveedor':values.get('PROVEEDOR'),
+            'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
+            'as_factor':float(self.as_factor),
+            'as_descontinuado':False,
+            'sale_ok':True,
+            'purchase_ok':True,
+            'as_costo_anterior':float(0.00),
+            'tf_check_update': 'no_update',
+            # 'default_code':values.get('PROVEEDOR'),
+        }
+        # _logger.debug("Valores create_product: %s", str(vals))
+        res = product_obj.create(vals)
+        return res    
