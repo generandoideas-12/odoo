@@ -94,7 +94,5 @@
             context="{'default_product_template_ids': active_ids}"
         /> -->
 
-        <menuitem id="as_importar_productos_menu" name="Importar Productos"
-            parent="sale.sale_menu_root" sequence="5" action="as_importar_productos_action"/>
     </data>
 </odoo>

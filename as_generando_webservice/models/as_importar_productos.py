@@ -184,6 +184,10 @@ class as_importar_productos(models.Model):
 
                     # Obtener nuevos productos
                     new_json_data = [y for y in jsondata if y['CODPROD'] not in productos]
+
+                    #borrar registros de nuevos
+                    # res2 = self.env['as.importar.productos.check'].limpiar()
+
                     for value in new_json_data:
                         
                         # Inicializar tiempo
@@ -193,6 +197,10 @@ class as_importar_productos(models.Model):
 
                         if value:
                             res = self.create_product(value)
+
+                            # Crear registro de productos nuevos
+                            res3 = self.env['as.importar.productos.check'].create_product(value)
+
                             tipo_operacion = 'CREATE'
                             count += 1
 
@@ -237,6 +245,7 @@ class as_importar_productos(models.Model):
                         search_res = [x for x in old_json_data if x['CODPROD'] == value['as_codigo_proveedor']]
                         if search_res:
                             values = search_res[0]
+                            
                             pro_id = self.env['product.product'].browse(value['id']).write({
                                 'name':values.get('NOMPROD'),
                                 'as_codigo_proveedor':values.get('CODPROD'),
@@ -301,11 +310,11 @@ class as_importar_productos(models.Model):
                 body += "<b>Datos REST Importados: </b></br>%s <br>" %(attach_url)
                 
                 ## NUEVOS PRODUCTOS
-                if value.get('create_tf'):
-                    nuevos_productos = self.as_diferencias(new_json_data)
-                    attach_id6 = self.as_generar_csv2(nuevos_productos,"nuevos_productos" + str(operacion.id) + ".csv",True)
-                    attach_url6 = "<a href='/web/content/" + str(attach_id6.id) + "?download=true' download='Nuevos Productos JSON " + str(attach_id6.id) + "'>Nuevos Productos JSON " + str(attach_id6.id) + "</a>"
-                    body += "<b>Nuevos Productos: </b></br>%s <br>" %(attach_url6)
+                # if value.get('create_tf'):
+                #     nuevos_productos = self.as_diferencias(new_json_data)
+                #     attach_id6 = self.as_generar_csv2(nuevos_productos,"nuevos_productos" + str(operacion.id) + ".csv",True)
+                #     attach_url6 = "<a href='/web/content/" + str(attach_id6.id) + "?download=true' download='Nuevos Productos JSON " + str(attach_id6.id) + "'>Nuevos Productos JSON " + str(attach_id6.id) + "</a>"
+                #     body += "<b>Nuevos Productos: </b></br>%s <br>" %(attach_url6)
 
                 ## DIFERENCIAS
                 # table_diferencias = tabulate(self.as_diferencias(jsondata),headers,tablefmt='html')
@@ -494,7 +503,7 @@ class as_importar_productos(models.Model):
 
 class as_importar_productos_check(models.Model):
     _name = "as.importar.productos.check"
-    _description = 'Importador de Productos Verificador'
+    _description = 'Productos Nuevos'
     _inherit = ['mail.thread']
     _order = "write_date desc"
 
@@ -531,7 +540,7 @@ class as_importar_productos_check(models.Model):
     
     @api.multi
     def create_product(self, values):
-        product_obj = self.env['product.product']
+        product_obj = self.env['as.importar.productos.check']
         vals = {
             'name':values.get('NOMPROD'),
             'as_codigo_proveedor':values.get('CODPROD'),
@@ -542,12 +551,15 @@ class as_importar_productos_check(models.Model):
             'list_price':float(values.get('COSUNIT'))*(1+self.as_factor),
             'as_factor':float(self.as_factor),
             'as_descontinuado':False,
-            'sale_ok':True,
-            'purchase_ok':True,
             'as_costo_anterior':float(0.00),
             'tf_check_update': 'no_update',
-            # 'default_code':values.get('PROVEEDOR'),
         }
         # _logger.debug("Valores create_product: %s", str(vals))
         res = product_obj.create(vals)
         return res    
+
+    def limpiar(self):
+        query = """
+            DELETE from as_importar_productos_check;
+        """
+        self.env.cr.execute(query)                

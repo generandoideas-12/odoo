@@ -19,10 +19,13 @@
     ],
     'data': [
         'views/as_importar_productos.xml',
+        'views/as_importar_productos_check.xml',
+        
         'views/as_product_template.xml',
         'views/as_product_descontinuados.xml',
         'wizard/as_product_report.xml',
         'security/ir.model.access.csv',
+        'views/as_menus.xml',
         'data/data.xml',
     ],
     "auto_install": False,
