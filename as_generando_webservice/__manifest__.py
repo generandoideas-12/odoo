@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         'views/as_menus.xml',
         'data/data.xml',
+        'views/as_sales_config_setting.xml',
     ],
     "auto_install": False,
     "installable": True,

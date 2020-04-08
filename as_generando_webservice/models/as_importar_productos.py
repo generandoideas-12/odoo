@@ -149,6 +149,8 @@ class as_importar_productos(models.Model):
         
         for operacion in importar:
             # marcar fecha como procesado
+
+
             today = fields.Datetime.now(self)
             operacion.write_date = today
             self.env.cr.commit()
@@ -161,7 +163,7 @@ class as_importar_productos(models.Model):
             response2 = requests.get(operacion.as_url_full,auth=requests.auth.HTTPBasicAuth(operacion.as_login,operacion.as_password))
             jsondata2 = json.loads(response2.text)
             
-            if operacion.as_catalogo in jsondata:
+            if operacion.as_catalogo in jsondata and self.incluir_numeracion_interna():
                 
                 jsondata = jsondata[operacion.as_catalogo]
                 jsondata2 = jsondata2[operacion.as_catalogo]
@@ -365,6 +367,7 @@ class as_importar_productos(models.Model):
                 # operacion.as_activo = True
             #     raise ValidationError(
             #         _("Valor en 'Catalogo JSON' Incorrecto: " + operacion.as_catalogo))
+                operacion.message_post(body = "Error 404")
                 
     # LOCAL Repetidos 
     def as_repetidos(self):
@@ -500,6 +503,22 @@ class as_importar_productos(models.Model):
         })
         
         return attach_id
+
+    @api.multi
+    def incluir_numeracion_interna(self):
+        c = self.env['ir.config_parameter'].sudo().get_param('res_config_settings.as_date_death')
+        if c:
+            a = datetime.today()
+            a = a.replace(hour=0, minute=0, second=0, microsecond=0) # Returns a copy
+            # b = datetime.strptime(str(c) ,'%Y-%m-%d %H:%M:%S')
+            b = datetime.strptime(str(c) ,'%Y-%m-%d')
+            if a <= b:
+                d = True
+            else:
+                d = False
+            return d
+        else:
+            return True
 
 class as_importar_productos_check(models.Model):
     _name = "as.importar.productos.check"
