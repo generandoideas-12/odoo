@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="as_view_order_image_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.sale.image</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="before">
+                <field name="image_small" widget="image" />
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <button name="update_create_picking" string="Actualizar Entrega" type="object" />
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="before">
+                <field name="image_small" widget="image" />
+            </xpath>
+            <field name="client_order_ref" position="after">
+                <field name="print_image" />
+                <field name="image_sizes" />
+            </field>
+            <xpath expr="//page[@name='other_information']" position="after">
+                <page string="Compras" name="compras_asociadas">
+                    <field name="line_purchases" />
+                </page>
+                <page string="Logistica" name="logistica">
+                    <field name="line_purchases_picking">
+                        <tree create="false" editable="bottom" decoration-success="state == 'transfer'"
+                            decoration-danger="state == 'cancel'" delete="0" domain="[('state','=','transfer')]">
+                            <field name="purchase_id" readonly="True" />
+                            <field name="partner_app_id" />
+                            <field name="location_app_dest_id" />
+                            <field name="location_app_id" />
+                            <field name="picking_id" readonly="True" />
+                            <field name="state_picking" readonly="True" />
+                            <field name="scheduled_date" readonly="True" />
+                            <field name="state" readonly="True" />
+                            <field name="as_product_insig" invisible="1" />
+                            <button name="action_create_picking" string="Transferir a Logistica" icon="fa-sign-out" states='draft'
+                                type="object" />
+                            <button name="action_anular_picking" string="Anular movimiento" icon="fa-window-close"
+                                type="object" states='draft,transfer' />
+
+                        </tree>
+                    </field>
+                </page>
+                <page string="Finanzas" name="finanzas">
+                    <field name="line_purchases_finanzas">
+                        <tree create="false" editable="bottom">
+                            <field name="purchase_id" readonly="True" />
+                            <field name="partner_app_id" readonly="True" />
+                            <field name="location_app_id" readonly="True" />
+                            <field name="as_invoice_id" readonly="True" />
+                            <field name="number" readonly="True" />
+                            <field name="ref" readonly="True" />
+                            <field name="date_vence" readonly="True" />
+                            <field name="impuesto" readonly="True" />
+                            <field name="impuesto_no" readonly="True" />
+                            <field name="amount_total" readonly="True" />
+                            <field name="residual" readonly="True" />
+                            <field name="state_invoice" readonly="True" />
+                        </tree>
+                    </field>
+                </page>
+                <page string="Diseño" name="diseno">
+                    <group col="4">
+                        <field name="cantidad" />
+                        <button name="action_obtener_propuesta" string="Obtener" type="object" />
+                    </group>
+                    <field name="line_propuesta">
+                        <tree editable="bottom" >
+                            <field name="product_id" />
+                            <field name="propuesta" widget="image" width="150px" height="150px" />
+                            <field name="observaciones" />
+                            <field name="state" />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="as_view_sales_purchase" model="ir.ui.view">
+        <field name="name">as.sales.purchase</field>
+        <field name="model">as.sale.purchase</field>
+        <field name="arch" type="xml">
+            <tree create="false" editable="bottom" decoration-success="state == 'transfer'"
+                decoration-danger="state == 'cancel'" delete="0">
+                <field name="as_product_insig" invisible="1" />
+                <field name="purchase_id" readonly="True" />
+                <field name="partner_id" readonly="True" />
+                <field name="partner_app_id" />
+                <field name="location_app_dest_id" />
+                <field name="location_app_id" />
+                <field name="state_purchase" />
+                <field name="picking_ids" widget="many2many_tags" />
+                <field name="date_purchase" />
+                <field name="total_compra" />
+                <field name="state" invisible="1" />
+                <button name="action_invoice_supplier" string="Generar Factura" icon="fa-file-text"
+                                type="object" states='draft,transfer' />
+
+
+            </tree>
+        </field>
+    </record>
+    <record id="action_open_window_edit" model="ir.actions.act_window">
+        <field name="name">as.line.purchase.sale</field>
+        <field name="res_model">as.sale.purchase</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="help">Vista emergente detalle factura en logistica</field>
+    </record>
+    <record id="as_stock_landed_cost_lines" model="ir.ui.view">
+        <field name="name">as.sale.purchase</field>
+        <field name="model">as.sale.purchase</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Datos de la Factura">
+                <separator string="Informacion extra de Factura" colspan="4" />
+                <group>
+                    <group>
+                        <field name="sale_id" readonly="1" />
+                    </group>
+                    <group>
+                        <field name="purchase_id" readonly="1" />
+                        <field name="picking_id" readonly="True" />
+
+                    </group>
+                </group>
+                <separator string="Datos Factura" colspan="4" />
+
+                <group>
+                    <group>
+
+                        <field name="partner_app_id" readonly="1" />
+                        <field name="as_invoice_id" readonly="1" />
+                    </group>
+                    <group>
+                        <field name="location_app_id" />
+                    </group>
+                </group>
+                <button name="action_create_invoice" string='Crear Factura' icon="fa-list-alt" class="oe_highlight"
+                    type="object" attrs="{'invisible': ['|',('as_invoice_id','!=',False)]}" />
+            </form>
+        </field>
+    </record>
+</odoo>

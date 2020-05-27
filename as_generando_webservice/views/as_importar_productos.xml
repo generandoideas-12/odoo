@@ -8,13 +8,18 @@
             <field name="arch" type="xml">
                 <form string="Importador de Productos">
                     <header>
-                        <button name="importar_productos" string="Importar" class="oe_highlight" type="object" confirm="El proceso de importacion puede tardar algunos minutos, procedemos?"/>
-                        <button name="activar" string="Activar" class="oe_highlight" type="object" confirm="Esta tarea de importacion sera planificada para ejecutarse, procedemos?"/>
+                        <button name="importar_productos" context="{'create_tf': 'create'}" string="Importar" class="oe_highlight" type="object"/>
+                        <button name="importar_productos" context="{'update_tf': 'update'}" string="Actualizar" class="oe_highlight" type="object"/>
+                        <button name="activar" string="Activar" class="oe_highlight" type="object"/>
+                        <button name="as_eliminar_adjuntos" string="Eliminar Adjuntos" class="oe_highlight" type="object"/>
+                        <button name="desactivar" string="Desactivar Todo" class="oe_highlight" type="object"/>
+                        
                     </header>
                     <sheet string="Importador de Productos">
                         <group>
                             <field name="name"/>
                             <field name="as_url"/>
+                            <field name="as_url_full"/>
                             <field name="as_login"/>
                             <field name="as_password"/>
                             <field name="as_iteracion"/>
@@ -39,7 +44,7 @@
             <field name="model">as.importar.productos</field>
             <field name="arch" type="xml">
                 <tree string="Importaciones">
-                    <!-- <field name="name"/> -->
+                    <field name="name"/>
                     <field name="write_date"/>
                     <field name="as_resultado"/>
                     <field name="as_activo"/>
@@ -65,7 +70,29 @@
             </field>
         </record>
 
-        <menuitem id="as_importar_productos_menu" name="Importar Productos"
-            parent="sale.sale_menu_root" sequence="5" action="as_importar_productos_action"/>
+        <!-- <record id="action_actualizar_costos_productos" model="ir.actions.act_window">
+            <field name="name">Actualizar Costos</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.actualizar.costos.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_actualizar_costos_product" />
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
+
+        <act_window
+            id="action_actualizar_costos_producto"
+            name="Actualizar costos"
+            res_model="product.actualizar.costos.wizard"
+            src_model="product.template"
+            view_mode="form"
+            view_type="form"
+            multi="True"
+            target="new"
+            key2="client_action_multi"
+            context="{'default_product_template_ids': active_ids}"
+        /> -->
+
     </data>
 </odoo>

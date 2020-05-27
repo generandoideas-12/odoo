@@ -19,6 +19,8 @@ class as_ProductTemplate(models.Model):
 	as_factor = fields.Float('Factor Precio', default=1)
 	as_descontinuado = fields.Boolean('Descontinuado', default=True)
 
+	tf_check_update = fields.Selection([('update', 'Update'), ('no_update', 'No Update')])
+
 	@api.depends('as_costo_anterior')
 	def _calcula_total(self):
 		for product in self:

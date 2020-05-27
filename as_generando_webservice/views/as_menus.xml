@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="as_importar_productos_main_menu" name="Importador"
+            parent="sale.sale_menu_root" sequence="5" action="as_importar_productos_action"/>
+
+        <menuitem id="as_importar_productos_menu" name="Planificador de Importacion"
+            parent="as_importar_productos_main_menu" sequence="5" action="as_importar_productos_action"/>            
+
+        <menuitem id="as_importar_productos_check_menu" name="Productos Nuevos"
+            parent="as_importar_productos_main_menu" sequence="10" action="as_importar_productos_check_action"/>
+
+    </data>
+</odoo>

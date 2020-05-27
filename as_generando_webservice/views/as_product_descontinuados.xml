@@ -68,7 +68,7 @@
             <field name="search_view_id" ref="as_view_cambio_product_tree" />
         </record>
         <record id="as_stock_product_normal_action_existencia" model="ir.actions.act_window">
-            <field name="name">Productos Cambio de Precio</field>
+            <field name="name">Productos en Existencia</field>
             <field name="res_model">product.template</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="domain">[('as_descontinuado','=',False)]</field>

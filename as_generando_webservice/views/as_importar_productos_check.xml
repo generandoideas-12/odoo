@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- tree ventas, campos adicionales -->
+        <record id="as_importar_productos_check_view_form" model="ir.ui.view">
+            <field name="name">as.importar.productos.check_view_form</field>
+            <field name="model">as.importar.productos.check</field>
+            <field name="arch" type="xml">
+                <form string="Producto Nuevo" create="false" delete="false" edit="false">
+                  <sheet string="Importador de Productos">
+                    <group>
+                      <field name="name"/>
+                      <field name="create_date"/>
+                      <!-- <field name="write_date"/> -->
+                      <field name="as_codigo_proveedor"/>
+                      <field name="as_costo_proveedor"/>
+                      <field name="as_existencias"/>
+                      <field name="as_name_proveedor"/>
+                      <field name="list_price"/>
+                      <field name="as_factor"/>
+                      <field name="as_descontinuado"/>
+                      <field name="as_costo_anterior"/>
+                      <field name="tf_check_update"/>
+                    </group>
+                  </sheet>
+                </form>
+            </field>
+        </record>  
+
+        <!-- tree ventas, campos adicionales -->
+        <record id="as_importar_productos_check_view_tree" model="ir.ui.view">
+            <field name="name">as.importar.productos.check_view_tree</field>
+            <field name="model">as.importar.productos.check</field>
+            <field name="arch" type="xml">
+                <tree string="Productos" create="false" delete="false">
+                    <field name="name"/>
+                    <field name="create_date"/>
+                    <!-- <field name="write_date"/> -->
+                    <field name="as_codigo_proveedor"/>
+                    <field name="as_costo_proveedor"/>
+                    <field name="as_existencias"/>
+                    <field name="as_name_proveedor"/>
+                    <field name="list_price"/>
+                    <field name="as_factor"/>
+                    <field name="as_descontinuado"/>
+                    <field name="as_costo_anterior"/>
+                    <field name="tf_check_update"/>
+                </tree>
+            </field>
+        </record>  
+
+        <!-- Accion de Importacion -->
+        <record id="as_importar_productos_check_action" model="ir.actions.act_window">
+            <field name="name">Productos Nuevos</field>
+            <field name="res_model">as.importar.productos.check</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" eval="as_importar_productos_check_view_tree"/>
+            <field name="target">current</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Crear una nueva importacion
+              </p>
+              <p>
+                Crear una registro y presionar IMPORTAR
+              </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
+
+

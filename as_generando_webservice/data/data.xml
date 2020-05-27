@@ -3,13 +3,25 @@
         <record id="as_cron_scheduler_importar_productos" model="ir.cron">
             <field name="name">As Scheduler - Importar productos de Endpoint</field>
             <field name="user_id" ref="base.user_root"/>
-            <field name="interval_number">8</field>
-            <field name="interval_type">hours</field>
+            <field name="interval_number">60</field>
+            <field name="interval_type">minutes</field>
             <field name="numbercall">-1</field>
             <field name="model_id" ref="model_as_importar_productos"/>
-            <field name="state">code</field>            
+            <field name="state">code</field>
             <field eval="False" name="doall"/>
-            <field name="code">model.importar_productos()</field>
+            <field name="code">model.importar_productos({'create_tf': 'create'})</field>
+        </record>
+
+        <record id="as_cron_scheduler_importar_productos_update" model="ir.cron">
+            <field name="name">As Scheduler - Update productos de Endpoint</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="model_id" ref="model_as_importar_productos"/>
+            <field name="state">code</field>
+            <field eval="False" name="doall"/>
+            <field name="code">model.importar_productos({'update_tf': 'update'})</field>
         </record>
     </data>
 </odoo>
