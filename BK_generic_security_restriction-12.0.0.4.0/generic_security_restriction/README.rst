@@ -15,7 +15,7 @@ Generic Security Restriction
 
 |badge2| |badge5|
 
-You can restrict (hide) menu groups and menu items for users depending on their permissions.
+You can restrict (hide) menu groups, menu items and access to any report / priniting form for users depending on their permissions.
 
 **Warning!** You can not grant access to the restricted menu items using access rights. Restrict menus for the Employee security group with caution.
 
