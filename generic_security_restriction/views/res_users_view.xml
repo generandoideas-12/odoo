@@ -6,10 +6,15 @@
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page name="page_hidden_menus" string="Hidden menus">
+                <page name="page_hidden_menus_reports" string="Restrictions">
                     <field name="hidden_menu_ids">
                         <tree>
-                            <field name="display_name"/>
+                            <field name="display_name" string="Hidden menus"/>
+                        </tree>
+                    </field>
+                    <field name="hidden_reports_ids">
+                        <tree>
+                            <field name="display_name" string="Hidden reports"/>
                         </tree>
                     </field>
                 </page>

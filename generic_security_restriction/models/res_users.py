@@ -7,6 +7,9 @@ class ResUsers(models.Model):
     hidden_menu_ids = fields.Many2many(
         'ir.ui.menu', 'ir_ui_menu_res_users_hidden_rel',
         'user_id', 'menu_id', string='Hidden menus')
+    hidden_reports_ids = fields.Many2many(
+        'ir.actions.report', 'ir_actions_report_res_users_hidden_reports_rel',
+        'user_id', 'report_id', string='Hidden print reports')
 
     @api.model
     def create(self, values):

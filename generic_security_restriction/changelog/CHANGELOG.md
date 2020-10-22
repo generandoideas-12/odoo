@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.3.0
+
+#### Version 0.3.0
+- Added ability to restirct access to any report / priniting form for any user.
+
+
 ## Version 0.1.11
 
 Added the ability to set field options :
