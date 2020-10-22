@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="as_view_descontinuado_product_tree" model="ir.ui.view">
+            <field name="name">as.product.stock.tree.descontinuado</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="as_codigo_proveedor" />
+                    <field name="name" />
+                    <field name="default_code" />
+                    <field name="as_name_proveedor" />
+                    <field name="as_descontinuado" invisible="True" />
+                </tree>
+            </field>
+        </record>
+        <record id="as_view_cambio_product_tree" model="ir.ui.view">
+            <field name="name">as.product.stock.tree.cambio</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="as_codigo_proveedor" />
+                    <field name="name" />
+                    <field name="default_code" />
+                    <field name="as_costo_anterior" />
+                    <field name="as_costo_proveedor" />
+                    <field name="as_name_proveedor" />
+                    <field name="as_price" />
+                    <field name="as_porcentaje" />
+                    <field name="as_descontinuado" invisible="True" />
+                </tree>
+            </field>
+        </record>
+        <record id="as_view_existencia_product_tree" model="ir.ui.view">
+            <field name="name">as.product.stock.tree.existencia</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="as_codigo_proveedor" />
+                    <field name="name" />
+                    <field name="default_code" />
+                    <field name="as_existencias" />
+                    <field name="as_name_proveedor" />
+                    <field name="as_descontinuado" invisible="True" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="as_stock_product_normal_action_descontinuado" model="ir.actions.act_window">
+            <field name="name">Productos Descontinuados</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('as_descontinuado','=',True)]</field>
+            <field name="view_type">form</field>
+
+            <field name="view_id" ref="as_view_descontinuado_product_tree" />
+            <field name="search_view_id" ref="as_view_descontinuado_product_tree" />
+        </record>
+
+        <record id="as_stock_product_normal_action_cambio" model="ir.actions.act_window">
+            <field name="name">Productos Cambio de Precio</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('as_descontinuado','=',False)]</field>
+            <field name="view_type">form</field>
+
+            <field name="view_id" ref="as_view_cambio_product_tree" />
+            <field name="search_view_id" ref="as_view_cambio_product_tree" />
+        </record>
+        <record id="as_stock_product_normal_action_existencia" model="ir.actions.act_window">
+            <field name="name">Productos en Existencia</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('as_descontinuado','=',False)]</field>
+            <field name="view_type">form</field>
+
+            <field name="view_id" ref="as_view_existencia_product_tree" />
+            <field name="search_view_id" ref="as_view_existencia_product_tree" />
+        </record>
+        <menuitem id="as_menu_cambios_config_stock" name="Productos Cambio de Precio"
+            action="as_stock_product_normal_action_cambio" parent="purchase.purchase_report" sequence="20" />
+        <menuitem id="as_menu_descontinuados_config_stock" name="Productos Descontinuados"
+            action="as_stock_product_normal_action_descontinuado" parent="purchase.purchase_report" sequence="21" />
+        <menuitem id="as_menu_existencia_config_stock" name="Productos en Existencia"
+            action="as_stock_product_normal_action_existencia" parent="purchase.purchase_report" sequence="22" />
+        
+    </data>
+</odoo>

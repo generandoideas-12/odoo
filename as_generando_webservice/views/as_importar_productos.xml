@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Formulario de Importacion -->
+        <record model="ir.ui.view" id="as_importar_productos_view_form">
+            <field name="name">as.importar.productos.view.form</field>
+            <field name="model">as.importar.productos</field>
+            <field name="arch" type="xml">
+                <form string="Importador de Productos">
+                    <header>
+                        <button name="importar_productos" context="{'create_tf': 'create'}" string="Importar" class="oe_highlight" type="object"/>
+                        <button name="importar_productos" context="{'update_tf': 'update'}" string="Actualizar" class="oe_highlight" type="object"/>
+                        <button name="activar" string="Activar" class="oe_highlight" type="object"/>
+                        <button name="as_eliminar_adjuntos" string="Eliminar Adjuntos" class="oe_highlight" type="object"/>
+                        <button name="desactivar" string="Desactivar Todo" class="oe_highlight" type="object"/>
+                        
+                    </header>
+                    <sheet string="Importador de Productos">
+                        <group>
+                            <field name="name"/>
+                            <field name="as_url"/>
+                            <field name="as_url_full"/>
+                            <field name="as_login"/>
+                            <field name="as_password"/>
+                            <field name="as_iteracion"/>
+                            <field name="as_limit"/>
+                            <field name="as_resultado"/>
+                            <field name="as_factor"/>
+                            <field name="as_activo"/>
+                            <field name="as_catalogo"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- tree ventas, campos adicionales -->
+        <record id="as_importar_productos_view_tree" model="ir.ui.view">
+            <field name="name">as.importar.productos_view_tree</field>
+            <field name="model">as.importar.productos</field>
+            <field name="arch" type="xml">
+                <tree string="Importaciones">
+                    <field name="name"/>
+                    <field name="write_date"/>
+                    <field name="as_resultado"/>
+                    <field name="as_activo"/>
+
+                </tree>
+            </field>
+        </record>  
+
+        <!-- Accion de Importacion -->
+        <record id="as_importar_productos_action" model="ir.actions.act_window">
+            <field name="name">Importador de Productos</field>
+            <field name="res_model">as.importar.productos</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" eval="as_importar_productos_view_tree"/>
+            <field name="target">current</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Crear una nueva importacion
+              </p><p>
+                Crear una registro y presionar IMPORTAR
+              </p>
+            </field>
+        </record>
+
+        <!-- <record id="action_actualizar_costos_productos" model="ir.actions.act_window">
+            <field name="name">Actualizar Costos</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.actualizar.costos.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_actualizar_costos_product" />
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
+
+        <act_window
+            id="action_actualizar_costos_producto"
+            name="Actualizar costos"
+            res_model="product.actualizar.costos.wizard"
+            src_model="product.template"
+            view_mode="form"
+            view_type="form"
+            multi="True"
+            target="new"
+            key2="client_action_multi"
+            context="{'default_product_template_ids': active_ids}"
+        /> -->
+
+    </data>
+</odoo>

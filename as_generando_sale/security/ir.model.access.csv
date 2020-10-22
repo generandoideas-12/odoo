@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+as_sale_purchase,as_sale_purchase,model_as_sale_purchase,,1,1,1,1
+as_propuesta,as_propuesta,model_as_propuesta,,1,1,1,1

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+
+<template id="template" xml:space="preserve">
+
+    <t t-extend="Chrome">
+        <t t-jquery=".pos-logo" t-operation="replace">
+            <t t-if="widget.pos.config != null and !widget.pos.config.pos_logo">
+                <img class="pos-logo" src="/point_of_sale/static/src/img/logo.png"/>
+            </t>
+
+            <t t-if="widget.pos.config != null and widget.pos.config.pos_logo">
+                <img class="pos-logo" t-att-src="widget.get_logo()"/>
+            </t>
+        </t>
+    </t>
+
+    <t t-extend="PosTicket">
+        <t t-jquery=".pos-sale-ticket" t-operation="prepend">
+            <t t-if="widget.pos.config and widget.pos.config.show_logo_on_receipt">
+                <t t-if="widget.pos.chrome and widget.pos.chrome.pos_logo_base_64">
+                    <img style="max-width: 70px;margin-left: 39%;" t-att-src="widget.pos.chrome.pos_logo_base_64"/>
+                </t>
+            </t>
+        </t>
+    </t>
+
+    <t t-extend="XmlReceipt">
+        <t t-jquery="img" t-operation="replace">
+            <t t-if="widget.pos.config and widget.pos.config.show_logo_on_receipt">
+                <t t-if="widget.pos.chrome and widget.pos.chrome.pos_logo_base_64">
+                    <img t-att-src="widget.pos.chrome.pos_logo_base_64"/>
+                </t>
+                <t t-if="!(widget.pos.chrome and widget.pos.chrome.pos_logo_base_64)">
+                    <t t-if='receipt.company.logo'>
+                        <img t-att-src='receipt.company.logo' />
+                        <br/>
+                    </t>
+                </t>
+            </t>
+            <t t-if="widget.pos.config and !widget.pos.config.show_logo_on_receipt">
+                <t t-if='receipt.company.logo'>
+                    <img t-att-src='receipt.company.logo' />
+                    <br/>
+                </t>
+            </t>
+        </t>
+    </t>
+</template>

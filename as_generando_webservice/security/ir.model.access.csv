@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+as_importar_productos,as.importar.productos,model_as_importar_productos,,1,1,1,1
+as_importar_productos_check,as.importar.productos.check,model_as_importar_productos_check,,1,1,1,1

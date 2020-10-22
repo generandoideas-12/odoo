@@ -1,0 +1,63 @@
+/* Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) */
+/* See LICENSE file for full copyright and licensing details. */
+/* License URL : <https://store.webkul.com/license.html/> */
+.wk_popup {
+    width: 900px !important;
+    height: 445px !important;
+    margin: auto;
+    margin-top: 70px;
+    font-size: 11px;
+    background-color: #F0EEEE;
+}
+
+.wk_print_quot {
+    height: 220px !important;
+    margin-top: 100px !important;
+}
+
+.wk_order_data {
+    margin-top: 10px;
+}
+
+.wk_note {
+    width: 579px;
+    height: 232px;
+}
+
+.input_date {
+    min-height: 0px !important;
+    font-size: 15px !important;
+    width: auto !important;
+    font-style: italic !important;
+}
+
+.wk_top_header {
+    height: 40px;
+}
+
+.wk_note,
+.extra_fee_value,
+.wk_address {
+    font-size: 21px !important;
+    margin: 6px 10px;
+    font-style: italic;
+    padding: 5px;
+}
+
+.wk_email {
+    width: 118px !important;
+}
+
+#no_extra_product {
+    bottom: 0px;
+    text-align: left;
+    padding-top: 16px;
+    height: 26px;
+    margin-top: 19px;
+    background:#ffede2;
+    display: none;
+}
+#no_extra_product span{
+    font-size: 14px;
+    color: #b42c2c;
+}

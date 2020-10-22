@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="as_sale_field_setting_view" model="ir.ui.view">
+            <field name="name">as.res.sale.user.form</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="sale.res_config_settings_view_form" />
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@id='sale_config_online_confirmation_pay']" position="after">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="as_date_death" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="as_date_death" />
+                            <div class="text-muted">
+                                Permite cambiar de estado a editable el campo numeracion interna en ventas
+                            </div>
+                        </div>
+                    </div>
+                    
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
