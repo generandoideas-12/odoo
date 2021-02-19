@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<odoo>
+	<record id="view_generic_hide_tree" model="ir.ui.view">
+            <field name="name">hide website menus</field>
+            <field name="model">hide.website_menus</field>
+            <field name="arch" type="xml">
+                <tree string="Hide Websites Menus" create="false" edit="false" delete="false">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_generic_hide_form" model="ir.ui.view">
+            <field name="name">hide website menus</field>
+            <field name="model">hide.website_menus</field>
+            <field name="arch" type="xml">
+                <form string="Hide Websites Menus and Pages" create="false" delete="false">
+                    <sheet>
+
+                		<field name="name" readonly="1" style="font-size:18pt;color:#403e3a;font-weight:bolder"/>
+
+                        <group>
+                            <field name="user_type" readonly="1"/>
+                        </group>
+
+                        <notebook>
+
+	                        <page string="Settings For Users">
+                                <h3>Hide Website Menus</h3>
+                                <br/>
+	                        	<field name="internal_user">
+                                </field>
+                                <br/>
+                                <h3>Hide Website Pages</h3>
+                                <br/>
+                                <field name="page_internal_user"/>
+	                        </page>
+
+                    	</notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="action_view_generic_hide" model="ir.actions.act_window">
+            <field name="name">Hide Website Menus Settings</field>
+            <field name="res_model">hide.website_menus</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+        </record>
+
+        <menuitem name="Generic Hide Menu Config"
+            id="menu_website_hide_settings"
+            action="action_view_generic_hide"
+            parent="website.menu_website_global_configuration"
+            sequence="100"/>
+
+
+        <record id="hide_menu_pages_specific_user" model="ir.ui.view">
+            <field name="name">hide_menus_and_pages_for_user</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//page[@name='access_rights']" position="after">
+                        <page string="Hide Menus">
+                            <field name="menus_user"/>
+                        </page>
+
+                        <page string="Hide Pages">
+                            <field name="page_user"/>
+                        </page>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+
+
+        <record id="hide_menu_pages_specific_group" model="ir.ui.view">
+            <field name="name">hide_menus_and_pages_for_specific_group</field>
+            <field name="model">res.groups</field>
+            <field name="inherit_id" ref="base.view_groups_form"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//notebook" position="inside">
+                        <page string="Hide Menus">
+                            <field name="menus_user"/>
+                        </page>
+
+                        <page string="Hide Pages">
+                            <field name="page_user"/>
+                        </page>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+
+        <record id="hide_specific_menus_for_specific_user" model="ir.ui.view">
+            <field name="name">hide_specific_menus_for_specific_user</field>
+            <field name="model">website.menu</field>
+            <field name="inherit_id" ref="website.website_menus_form_view"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='child_id']" position="after">
+                        <notebook>
+                            <page string="Hide From Users">
+                                <field name="hide_user"/>
+                            </page>
+
+                            <page string="Hide From Groups">
+                                <field name="hide_groups"/>
+                            </page>
+
+                        </notebook>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+</odoo>
