@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <template id="user_error_template" name="Required Login">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty" style="float:left; margin:100px 0 0 100px;">
+                <h1>For Accessing This Login Required!</h1>
+                <p>
+                    <a href="/web/login">Login here</a>
+                </p>
+            </div>
+        </t>
+    </template>
+
+</odoo>

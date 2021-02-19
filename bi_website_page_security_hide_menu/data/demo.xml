@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+
+	<data>
+		<record id="default_name_internal" model="hide.website_menus">
+			<field name="name">INTERNAL : Hide Websites Menus and Pages for Internal Users</field>
+			<field name="user_type">internal</field>
+		</record>
+
+		<record id="default_name_portal" model="hide.website_menus">
+			<field name="name">PORTAL : Hide Websites Menus and Pages for Portal Users</field>
+			<field name="user_type">portal</field>
+		</record>
+
+		<record id="default_name_public" model="hide.website_menus">
+			<field name="name">PUBLIC : Hide Websites Menus and Pages for Public Users</field>
+			<field name="user_type">public</field>
+		</record>
+
+
+	</data>
+
+</openerp>
